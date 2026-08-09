@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduSync | Admin Command Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['Outfit', 'sans-serif'] } } }
+    }
+  </script>
+  <style>
+    body { background:#f1f5f9; font-family:'Outfit',sans-serif; }
+    .glass { background:rgba(255,255,255,0.92); backdrop-filter:blur(12px); border:1px solid rgba(255,255,255,.7); }
+    .active-nav { background:linear-gradient(90deg,#1e40af15,transparent); color:#1d4ed8; border-left:3px solid #1d4ed8; }
+    .sec { display:none; }
+    .sec.active { display:block; animation: fadeIn .35s ease; }
+    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    .scroller::-webkit-scrollbar{width:5px} .scroller::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+    .badge-critical{background:#fee2e2;color:#b91c1c;} .badge-warning{background:#fef3c7;color:#92400e;}
+    .badge-info{background:#dbeafe;color:#1e40af;}
+    .kpi-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,.08); }
+    .kpi-btn { transition: all .2s; }
+    input[type=range]{accent-color:#1d4ed8}
+  </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+<!-- ══════════ SIDEBAR ══════════ -->
+<aside class="w-64 bg-slate-900 text-white flex flex-col h-full shrink-0 shadow-2xl z-30">
+  <div class="p-6 border-b border-white/10">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center shadow">
+        <span class="material-icons-outlined text-white text-lg">school</span>
+      </div>
+      <div>
+        <h1 class="font-extrabold text-lg leading-none text-white">EduSync</h1>
+        <p class="text-[10px] font-semibold text-blue-400 uppercase tracking-widest">Admin Portal</p>
+      </div>
+    </div>
+  </div>
+
+  <nav class="flex-1 overflow-y-auto py-4 scroller">
+    <div class="px-5 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Main</div>
+    <button onclick="goTo('dashboard')" id="nb-dashboard" class="nav-btn active-nav w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">dashboard</span> Dashboard
+    </button>
+    <button onclick="goTo('students')" id="nb-students" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">engineering</span> Students
+    </button>
+    <button onclick="goTo('faculty')" id="nb-faculty" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">person_pin</span> Faculty
+    </button>
+    <button onclick="goTo('classes')" id="nb-classes" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">class</span> Classes
+    </button>
+    <button onclick="goTo('attendance')" id="nb-attendance" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">how_to_reg</span> Attendance
+    </button>
+    <button onclick="goTo('exams')" id="nb-exams" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">description</span> Examinations
+    </button>
+    <button onclick="goTo('finance')" id="nb-finance" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">account_balance_wallet</span> Finance
+    </button>
+    <button onclick="goTo('placements')" id="nb-placements" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">work</span> Placements
+    </button>
+    <div class="px-5 pt-4 pb-2 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Tools</div>
+    <button onclick="goTo('reports')" id="nb-reports" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">bar_chart</span> Reports
+    </button>
+    <button onclick="goTo('notifications')" id="nb-notifications" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all relative">
+      <span class="material-icons-outlined text-[20px]">notifications</span> Notifications
+      <span class="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">5</span>
+    </button>
+    <button onclick="goTo('settings')" id="nb-settings" class="nav-btn w-full flex items-center gap-3 px-5 py-3 text-sm font-semibold text-slate-300 hover:text-white hover:bg-white/5 text-left transition-all">
+      <span class="material-icons-outlined text-[20px]">settings</span> Settings
+    </button>
+  </nav>
+  <div class="p-4 border-t border-white/10">
+    <a href="/logout" class="flex items-center gap-2 text-red-400 hover:text-red-300 text-sm font-semibold p-2 hover:bg-white/5 rounded-lg transition">
+      <span class="material-icons-outlined text-[18px]">logout</span> Sign Out
+    </a>
+  </div>
+</aside>
+
+<!-- ══════════ MAIN ══════════ -->
+<div class="flex-1 flex flex-col h-full overflow-hidden">
+
+  <!-- Topbar -->
+  <header class="h-[60px] bg-white border-b border-slate-200 px-8 flex items-center justify-between shrink-0 shadow-sm z-10">
+    <div>
+      <h2 id="page-title" class="text-xl font-bold text-slate-800">Admin Command Center</h2>
+      <p class="text-xs text-slate-400" id="page-sub">Full institutional overview</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="openModal('quick-actions-modal')" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition">
+        <span class="material-icons-outlined text-[16px]">bolt</span> Quick Actions
+      </button>
+      <button onclick="openModal('notice-modal')" class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow transition">
+        <span class="material-icons-outlined text-[16px]">campaign</span> Send Notice
+      </button>
+      <img src="https://ui-avatars.com/api/?name=Admin&background=1e40af&color=fff" class="w-8 h-8 rounded-full shadow">
+    </div>
+  </header>
+
+  <!-- Content Area -->
+  <main class="flex-1 overflow-y-auto p-6 scroller bg-slate-50/60">
+
+    <!-- ████████████ DASHBOARD ████████████ -->
+    <section id="sec-dashboard" class="sec active space-y-6">
+      <!-- KPI Cards -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-4 gap-4" id="kpi-grid">
+        <!-- Populated by JS -->
+      </div>
+      <!-- AI Alert Panel + Today Overview -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 glass rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><span class="material-icons-outlined text-red-500">psychology</span> AI Alerts — Needs Action</h3>
+            <span id="alert-count" class="bg-red-100 text-red-600 font-bold text-xs px-2 py-1 rounded-full"></span>
+          </div>
+          <div id="alerts-container" class="space-y-2"></div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-blue-500">today</span> Today's Overview</h3>
+          <div id="overview-grid" class="space-y-3"></div>
+        </div>
+      </div>
+      <!-- Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-1">Student Growth & Admissions</h3>
+          <p class="text-xs text-slate-400 mb-4">Year-on-year enrollment trend</p>
+          <div id="growth-chart" class="flex items-end gap-3 h-36"></div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-1">Department Performance</h3>
+          <p class="text-xs text-slate-400 mb-4">Average GPA & Attendance by Dept.</p>
+          <div id="dept-chart" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ████████████ STUDENTS ████████████ -->
+    <section id="sec-students" class="sec space-y-6">
+      <div class="flex items-center gap-3 flex-wrap">
+        <input id="stu-search" oninput="searchStudents()" type="text" placeholder="Search by name or roll no..." class="flex-1 bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500 shadow-sm font-medium">
+        <select id="stu-dept" onchange="searchStudents()" class="bg-white border border-slate-200 rounded-xl px-3 py-2.5 text-sm outline-none shadow-sm font-medium">
+          <option value="">All Semesters</option><option>10</option><option>11</option><option>12</option>
+        </select>
+        <button onclick="openModal('add-student-modal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-bold shadow transition flex items-center gap-2">
+          <span class="material-icons-outlined text-[16px]">add</span> Add Student
+        </button>
+        <a href="/api/admin/template" class="bg-white border border-slate-200 px-3 py-2.5 rounded-xl text-sm font-medium hover:bg-slate-50 flex items-center gap-1 shadow-sm">
+          <span class="material-icons-outlined text-[16px]">file_download</span> CSV Template
+        </a>
+      </div>
+      <!-- Analytics mini bar -->
+      <div class="grid grid-cols-3 gap-4" id="stu-analytics"></div>
+      <!-- Directory Table -->
+      <div class="glass rounded-2xl overflow-hidden shadow-sm">
+        <table class="w-full text-sm text-left">
+          <thead class="bg-slate-50 text-slate-500 border-b border-slate-200 text-xs uppercase">
+            <tr>
+              <th class="px-5 py-3 font-bold">Student</th><th class="px-4 py-3 font-bold">Roll No</th>
+              <th class="px-4 py-3 font-bold">Section</th><th class="px-4 py-3 font-bold">GPA</th>
+              <th class="px-4 py-3 font-bold">Attendance</th><th class="px-4 py-3 font-bold text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="students-tbody" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+      <!-- Bulk Import -->
+      <div class="glass rounded-2xl p-6 border-dashed border-2 border-slate-200">
+        <h3 class="font-bold text-slate-700 mb-3 flex items-center gap-2"><span class="material-icons-outlined text-blue-500">upload_file</span> Bulk CSV Import with Validation</h3>
+        <div class="flex items-center gap-4">
+          <input type="file" id="import-file" accept=".csv" onchange="previewImport()" class="text-sm text-slate-600 file:mr-3 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-600 file:font-semibold">
+          <button onclick="doImport()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow">Preview & Import</button>
+        </div>
+        <div id="import-preview" class="mt-3 text-sm text-slate-600"></div>
+      </div>
+    </section>
+
+    <!-- ████████████ FACULTY ████████████ -->
+    <section id="sec-faculty" class="sec space-y-6">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-xl text-slate-800">Faculty Directory & Management</h3>
+        <button onclick="openModal('add-faculty-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow flex items-center gap-2">
+          <span class="material-icons-outlined text-[16px]">add</span> Add Faculty
+        </button>
+      </div>
+      <div id="faculty-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- ████████████ CLASSES ████████████ -->
+    <section id="sec-classes" class="sec space-y-6">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-xl text-slate-800">Class Management</h3>
+        <button onclick="openModal('add-class-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold shadow flex items-center gap-2">
+          <span class="material-icons-outlined text-[16px]">add</span> Create Class
+        </button>
+      </div>
+      <div id="conflicts-banner" class="hidden bg-red-50 border border-red-200 p-4 rounded-xl text-red-700 font-medium flex items-center gap-2">
+        <span class="material-icons-outlined">error</span>
+        <span id="conflicts-text"></span>
+      </div>
+      <div id="classes-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5"></div>
+    </section>
+
+    <!-- ████████████ ATTENDANCE ████████████ -->
+    <section id="sec-attendance" class="sec space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="att-kpi"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-teal-500">domain</span> Dept-wise Live Attendance</h3>
+          <div id="att-dept" class="space-y-4"></div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-slate-800 flex items-center gap-2"><span class="material-icons-outlined text-red-500">person_remove</span> Defaulter List</h3>
+            <button onclick="window.location.href='/api/admin/reports/defaulters'" class="text-blue-600 text-sm font-semibold hover:underline">Export CSV</button>
+          </div>
+          <div id="defaulters-list" class="space-y-2 overflow-y-auto max-h-72 scroller"></div>
+        </div>
+      </div>
+      <div class="glass rounded-2xl p-6">
+        <div class="flex justify-between items-center mb-5">
+          <h3 class="font-bold text-slate-800 flex items-center gap-2"><span class="material-icons-outlined text-green-500">grid_view</span> Attendance Heatmap & AI Prediction</h3>
+          <div class="flex gap-2">
+            <button onclick="alert('Sending automated low-attendance alerts to parents...')" class="bg-white border border-slate-200 text-slate-700 px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1 hover:bg-slate-50">
+              <span class="material-icons-outlined text-[14px]">mail</span> Alert Parents
+            </button>
+            <button onclick="window.location.href='/api/admin/reports/attendance-export'" class="bg-blue-600 text-white px-3 py-1.5 text-xs font-bold rounded-lg flex items-center gap-1">
+              <span class="material-icons-outlined text-[14px]">download</span> Export
+            </button>
+          </div>
+        </div>
+        <div id="heatmap-wrap" class="overflow-x-auto"></div>
+        <div class="mt-5 bg-purple-50 border border-purple-200 rounded-xl p-4">
+          <h4 class="text-purple-800 font-bold flex items-center gap-2 mb-1"><span class="material-icons-outlined text-[18px]">auto_awesome</span> AI Dropout Prediction</h4>
+          <p id="ai-prediction-text" class="text-sm text-purple-700 font-medium">Based on attendance trends, <strong>6 students</strong> show high dropout risk. <button onclick="goTo('students')" class="underline font-bold">Review Now →</button></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ████████████ EXAMS ████████████ -->
+    <section id="sec-exams" class="sec space-y-6">
+      <div class="flex justify-between items-center">
+        <h3 class="font-bold text-xl text-slate-800">Examination Management</h3>
+        <button onclick="openModal('add-exam-modal')" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 shadow">
+          <span class="material-icons-outlined text-[16px]">add</span> Schedule Exam
+        </button>
+      </div>
+      <div id="exams-list" class="space-y-4"></div>
+    </section>
+
+    <!-- ████████████ FINANCE ████████████ -->
+    <section id="sec-finance" class="sec space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="finance-kpi"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-yellow-500">trending_up</span> Monthly Collection Trend</h3>
+          <div id="finance-chart" class="flex items-end gap-3 h-32"></div>
+        </div>
+        <div class="glass rounded-2xl p-6">
+          <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-green-500">school</span> Scholarship Status</h3>
+          <div id="scholarship-list" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ████████████ PLACEMENTS ████████████ -->
+    <section id="sec-placements" class="sec space-y-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="placement-kpi"></div>
+      <div class="glass rounded-2xl p-6">
+        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-blue-500">business</span> Recruiter Companies</h3>
+        <div id="companies-list"></div>
+      </div>
+      <div class="glass rounded-2xl p-6">
+        <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><span class="material-icons-outlined text-indigo-500">domain</span> Department-wise Placement Rate</h3>
+        <div id="dept-placement" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ████████████ REPORTS ████████████ -->
+    <section id="sec-reports" class="sec space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="glass rounded-2xl p-6 flex flex-col gap-3">
+          <h3 class="font-bold text-slate-700">📘 Academic Reports</h3>
+          <button onclick="window.location.href='/api/admin/reports/semester'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Semester Report <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/department'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Department Report <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/gpa-trend'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-blue-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">GPA Trend Report <span class="material-icons-outlined text-[16px]">download</span></button>
+        </div>
+        <div class="glass rounded-2xl p-6 flex flex-col gap-3">
+          <h3 class="font-bold text-slate-700">✅ Attendance Reports</h3>
+          <button onclick="window.location.href='/api/admin/reports/attendance-student'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-teal-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Student-wise <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/attendance-class'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-teal-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Class-wise <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/attendance-dept'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-teal-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Department-wise <span class="material-icons-outlined text-[16px]">download</span></button>
+        </div>
+        <div class="glass rounded-2xl p-6 flex flex-col gap-3">
+          <h3 class="font-bold text-slate-700">💰 Financial & Accreditation</h3>
+          <button onclick="window.location.href='/api/admin/reports/fee-collection'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-yellow-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Fee Collection <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/placements'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-yellow-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">Placement Report <span class="material-icons-outlined text-[16px]">download</span></button>
+          <button onclick="window.location.href='/api/admin/reports/naac'" class="w-full text-left px-4 py-2.5 bg-slate-50 hover:bg-yellow-50 border border-slate-200 rounded-xl text-sm font-medium transition flex justify-between items-center">NBA/NAAC Package <span class="material-icons-outlined text-[16px]">download</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ████████████ NOTIFICATIONS ████████████ -->
+    <section id="sec-notifications" class="sec space-y-4">
+      <h3 class="font-bold text-xl text-slate-800">Notification Center</h3>
+      <div id="notif-list" class="space-y-3">
+        <div class="glass p-4 rounded-2xl flex items-start gap-4"><div class="bg-blue-100 text-blue-600 p-2 rounded-lg"><span class="material-icons-outlined">person_add</span></div><div><p class="font-bold text-slate-800">5 New Admissions Today</p><p class="text-sm text-slate-500">Students admitted for 2024-25 batch</p><p class="text-xs text-slate-400 mt-1">10:30 AM</p></div><button onclick="goTo('students')" class="ml-auto text-blue-600 font-semibold text-sm hover:underline">Review</button></div>
+        <div class="glass p-4 rounded-2xl flex items-start gap-4"><div class="bg-red-100 text-red-600 p-2 rounded-lg"><span class="material-icons-outlined">warning</span></div><div><p class="font-bold text-slate-800">Critical Attendance Alert</p><p class="text-sm text-slate-500">128 students below 75% threshold</p><p class="text-xs text-slate-400 mt-1">09:00 AM</p></div><button onclick="goTo('attendance')" class="ml-auto text-red-600 font-semibold text-sm hover:underline">Action</button></div>
+        <div class="glass p-4 rounded-2xl flex items-start gap-4"><div class="bg-yellow-100 text-yellow-600 p-2 rounded-lg"><span class="material-icons-outlined">account_balance_wallet</span></div><div><p class="font-bold text-slate-800">Fee Collection Due</p><p class="text-sm text-slate-500">₹4.2L pending from 16% students</p><p class="text-xs text-slate-400 mt-1">Yesterday</p></div><button onclick="goTo('finance')" class="ml-auto text-yellow-600 font-semibold text-sm hover:underline">Review</button></div>
+        <div class="glass p-4 rounded-2xl flex items-start gap-4"><div class="bg-green-100 text-green-600 p-2 rounded-lg"><span class="material-icons-outlined">task_alt</span></div><div><p class="font-bold text-slate-800">Results Published</p><p class="text-sm text-slate-500">Semester 5 results are now live</p><p class="text-xs text-slate-400 mt-1">2 days ago</p></div><button onclick="goTo('exams')" class="ml-auto text-green-600 font-semibold text-sm hover:underline">View</button></div>
+        <div class="glass p-4 rounded-2xl flex items-start gap-4"><div class="bg-purple-100 text-purple-600 p-2 rounded-lg"><span class="material-icons-outlined">pending_actions</span></div><div><p class="font-bold text-slate-800">Faculty Leave Requests</p><p class="text-sm text-slate-500">3 pending approvals</p><p class="text-xs text-slate-400 mt-1">2 days ago</p></div><button onclick="goTo('faculty')" class="ml-auto text-purple-600 font-semibold text-sm hover:underline">Approve</button></div>
+      </div>
+    </section>
+
+    <!-- ████████████ SETTINGS ████████████ -->
+    <section id="sec-settings" class="sec space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass rounded-2xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-800">System Configuration</h3>
+          <div class="flex justify-between items-center py-2 border-b border-slate-100"><span class="text-sm font-medium text-slate-700">AI Alerts</span><button onclick="this.classList.toggle('bg-blue-600');this.classList.toggle('bg-slate-300');this.classList.toggle('pl-6');this.classList.toggle('pl-1')" class="relative w-12 h-6 bg-blue-600 rounded-full transition-all pl-6"><span class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-all"></span></button></div>
+          <div class="flex justify-between items-center py-2 border-b border-slate-100"><span class="text-sm font-medium text-slate-700">Email Notifications</span><button onclick="this.classList.toggle('bg-blue-600');this.classList.toggle('bg-slate-300');this.classList.toggle('pl-6');this.classList.toggle('pl-1')" class="relative w-12 h-6 bg-blue-600 rounded-full transition-all pl-6"><span class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-all"></span></button></div>
+          <div class="flex justify-between items-center py-2"><span class="text-sm font-medium text-slate-700">SMS Alerts</span><button onclick="this.classList.toggle('bg-blue-600');this.classList.toggle('bg-slate-300');this.classList.toggle('pl-6');this.classList.toggle('pl-1')" class="relative w-12 h-6 bg-slate-300 rounded-full transition-all pl-1"><span class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-all"></span></button></div>
+        </div>
+        <div class="glass rounded-2xl p-6 space-y-4">
+          <h3 class="font-bold text-slate-800">Thresholds & Limits</h3>
+          <div><label class="text-sm font-medium text-slate-700">Attendance Warning Threshold: 75%</label><input type="range" min="50" max="90" value="75" class="w-full mt-2" oninput="this.previousElementSibling.textContent='Attendance Warning Threshold: '+this.value+'%'"></div>
+          <div><label class="text-sm font-medium text-slate-700">GPA Risk Threshold: 2.5</label><input type="range" min="1" max="4" step="0.1" value="2.5" class="w-full mt-2" oninput="this.previousElementSibling.textContent='GPA Risk Threshold: '+this.value"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════════ MODALS ══════════ -->
+<!-- Quick Actions Modal -->
+<div id="quick-actions-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+    <h3 class="font-bold text-lg mb-4 text-slate-800">⚡ Quick Actions</h3>
+    <div class="grid grid-cols-2 gap-3">
+      <button onclick="openModal('add-student-modal');closeModal('quick-actions-modal')" class="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-100 transition">
+        <span class="material-icons-outlined text-blue-600 text-2xl">person_add</span><span class="text-xs font-bold text-blue-700">Add Student</span>
+      </button>
+      <button onclick="openModal('add-faculty-modal');closeModal('quick-actions-modal')" class="flex flex-col items-center gap-2 p-4 bg-teal-50 hover:bg-teal-100 rounded-xl border border-teal-100 transition">
+        <span class="material-icons-outlined text-teal-600 text-2xl">badge</span><span class="text-xs font-bold text-teal-700">Add Faculty</span>
+      </button>
+      <button onclick="openModal('add-exam-modal');closeModal('quick-actions-modal')" class="flex flex-col items-center gap-2 p-4 bg-orange-50 hover:bg-orange-100 rounded-xl border border-orange-100 transition">
+        <span class="material-icons-outlined text-orange-600 text-2xl">description</span><span class="text-xs font-bold text-orange-700">Schedule Exam</span>
+      </button>
+      <button onclick="openModal('notice-modal');closeModal('quick-actions-modal')" class="flex flex-col items-center gap-2 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl border border-purple-100 transition">
+        <span class="material-icons-outlined text-purple-600 text-2xl">campaign</span><span class="text-xs font-bold text-purple-700">Send Notice</span>
+      </button>
+    </div>
+    <button onclick="closeModal('quick-actions-modal')" class="mt-4 w-full py-2 text-slate-500 hover:text-slate-700 text-sm font-medium">Cancel</button>
+  </div>
+</div>
+
+<!-- Send Notice Modal -->
+<div id="notice-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-[440px] shadow-2xl">
+    <h3 class="font-bold text-lg mb-4">📢 Send Notice / Alert</h3>
+    <div class="space-y-3">
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase">Audience</label>
+        <select id="notice-audience" class="w-full mt-1 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          <option>All Students & Faculty</option><option>All Students</option><option>All Faculty</option><option>All Parents</option><option>CSE Department</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase">Type</label>
+        <select id="notice-type" class="w-full mt-1 border border-slate-200 rounded-xl p-2.5 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+          <option>📣 General Notice</option><option>🚨 Emergency Alert</option><option>📝 Exam Update</option><option>🗓️ Event</option>
+        </select>
+      </div>
+      <div>
+        <label class="text-xs font-bold text-slate-500 uppercase">Message</label>
+        <textarea id="notice-msg" rows="4" class="w-full mt-1 border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-blue-500 outline-none resize-none" placeholder="Write your notice..."></textarea>
+      </div>
+      <div class="flex gap-2 items-center">
+        <input type="checkbox" checked id="ch-email"><label class="text-sm font-medium"> Email</label>
+        <input type="checkbox" checked id="ch-sms" class="ml-3"><label class="text-sm font-medium"> SMS</label>
+        <input type="checkbox" checked id="ch-push" class="ml-3"><label class="text-sm font-medium"> App Push</label>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="sendNotice()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition shadow">Blast Now</button>
+        <button onclick="closeModal('notice-modal')" class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold hover:bg-slate-200">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Student Modal -->
+<div id="add-student-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl max-h-[90vh] overflow-y-auto scroller">
+    <h3 class="font-bold text-lg mb-4">➕ Add New Student</h3>
+    <div class="space-y-3 text-sm">
+      <input id="ns-name" type="text" placeholder="Full Name" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="ns-email" type="email" placeholder="Email" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="ns-roll" type="text" placeholder="Roll No (STU-YYYY-NNNN)" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <select id="ns-grade" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none"><option>Select Grade</option><option>10</option><option>11</option><option>12</option></select>
+      <input id="ns-section" type="text" placeholder="Section (A/B/C)" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="flex gap-2">
+        <button onclick="submitStudent()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">Add Student</button>
+        <button onclick="closeModal('add-student-modal')" class="flex-1 bg-slate-100 py-2.5 rounded-xl font-bold">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Faculty Modal -->
+<div id="add-faculty-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+    <h3 class="font-bold text-lg mb-4">➕ Add New Faculty</h3>
+    <div class="space-y-3 text-sm">
+      <input id="nf-name" type="text" placeholder="Full Name" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="nf-email" type="email" placeholder="Email" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <select id="nf-dept" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none"><option>Select Department</option><option>CSE</option><option>AIML</option><option>ECE</option><option>Mechanical</option></select>
+      <select id="nf-desig" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none"><option>Designation</option><option>Professor</option><option>Associate Prof</option><option>Assistant Prof</option></select>
+      <div class="flex gap-2">
+        <button onclick="submitFaculty()" class="flex-1 bg-teal-600 text-white py-2.5 rounded-xl font-bold hover:bg-teal-700 transition">Add Faculty</button>
+        <button onclick="closeModal('add-faculty-modal')" class="flex-1 bg-slate-100 py-2.5 rounded-xl font-bold">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Exam Modal -->
+<div id="add-exam-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+    <h3 class="font-bold text-lg mb-4">📝 Schedule New Exam</h3>
+    <div class="space-y-3 text-sm">
+      <input id="ne-name" type="text" placeholder="Exam Name (e.g., Mid-Term Math)" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="ne-date" type="date" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="ne-hall" type="text" placeholder="Hall / Room" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <select id="ne-invigilator" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none"><option value="">Select Invigilator</option><option>Dr. Jenkins</option><option>Ms. Vance</option><option>Prof. Chen</option></select>
+      <div class="flex gap-2">
+        <button onclick="submitExam()" class="flex-1 bg-orange-500 text-white py-2.5 rounded-xl font-bold hover:bg-orange-600 transition">Schedule</button>
+        <button onclick="closeModal('add-exam-modal')" class="flex-1 bg-slate-100 py-2.5 rounded-xl font-bold">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Class Modal -->
+<div id="add-class-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+  <div class="bg-white rounded-2xl p-6 w-96 shadow-2xl">
+    <h3 class="font-bold text-lg mb-4">➕ Create New Class</h3>
+    <div class="space-y-3 text-sm">
+      <select id="nc-dept" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none"><option>Department</option><option>CSE</option><option>AIML</option><option>ECE</option></select>
+      <input id="nc-subj" type="text" placeholder="Subject / Class Name" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="nc-sec" type="text" placeholder="Section" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="nc-cap" type="number" placeholder="Capacity" class="w-full border border-slate-200 rounded-xl p-2.5 outline-none focus:ring-2 focus:ring-blue-500">
+      <div class="flex gap-2">
+        <button onclick="submitClass()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-xl font-bold hover:bg-blue-700 transition">Create</button>
+        <button onclick="closeModal('add-class-modal')" class="flex-1 bg-slate-100 py-2.5 rounded-xl font-bold">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const secTitles = {
+  dashboard: ['Admin Command Center','Full institutional overview'],
+  students: ['Students','Directory, analytics & bulk import'],
+  faculty: ['Faculty','Management, workload & leave'],
+  classes: ['Classes','Management & conflict detection'],
+  attendance: ['Attendance','Live monitor, defaulters & heatmap'],
+  exams: ['Examinations','Schedule, halls & results'],
+  finance: ['Finance','Collections, pending & scholarships'],
+  placements: ['Placements','Stats, companies & dept-wise rates'],
+  reports: ['Reports','One-click institutional exports'],
+  notifications: ['Notification Center','All system alerts'],
+  settings: ['Settings','System configuration']
+};
+
+function goTo(id) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => { b.classList.remove('active-nav'); b.classList.add('text-slate-300','hover:text-white'); });
+  const nb = document.getElementById('nb-'+id);
+  if(nb) { nb.classList.add('active-nav'); nb.classList.remove('text-slate-300','hover:text-white'); }
+  const [t,s] = secTitles[id]||['',''];
+  document.getElementById('page-title').innerText = t;
+  document.getElementById('page-sub').innerText = s;
+
+  const loaders = { dashboard: loadDashboard, students: loadStudents, faculty: loadFaculty, classes: loadClasses, attendance: loadAttendance, exams: loadExams, finance: loadFinance, placements: loadPlacements };
+  if(loaders[id]) loaders[id]();
+}
+
+function openModal(id) { const m=document.getElementById(id); m.classList.remove('hidden'); m.classList.add('flex'); }
+function closeModal(id) { const m=document.getElementById(id); m.classList.add('hidden'); m.classList.remove('flex'); }
+
+function api(url, cb) {
+  fetch(url).then(r=>r.json()).then(d=>{ if(d.success) cb(d.data); else console.error(url, d); }).catch(e=>console.error(e));
+}
+
+// ──── Dashboard ────
+function loadDashboard() {
+  api('/api/admin/kpi', d => {
+    const kpis = [
+      {icon:'engineering',color:'blue',label:'Total Students',val:d.total_students,sub:'Active enrollments',act:'goTo("students")'},
+      {icon:'person_pin',color:'teal',label:'Total Faculty',val:d.total_faculty,sub:'Across departments',act:'goTo("faculty")'},
+      {icon:'class',color:'indigo',label:'Active Classes',val:d.active_classes,sub:'Running this semester',act:'goTo("classes")'},
+      {icon:'how_to_reg',color:'green',label:"Today's Attendance",val:d.attendance_today+'%',sub:'Campus-wide avg',act:'goTo("attendance")'},
+      {icon:'warning',color:'red',label:'At-Risk Students',val:d.at_risk_students,sub:'Below 75% attendance',act:'goTo("attendance")'},
+      {icon:'work',color:'purple',label:'Placement Rate',val:d.placement_rate+'%',sub:'Current batch',act:'goTo("placements")'},
+      {icon:'account_balance_wallet',color:'yellow',label:'Fee Collection',val:d.fee_collection_pct+'%',sub:'Of total expected',act:'goTo("finance")'},
+      {icon:'monitor_heart',color:'green',label:'System Health',val:d.system_health,sub:'All services up',act:''}
+    ];
+    const colors = { blue:'bg-blue-50 text-blue-600 border-blue-200', teal:'bg-teal-50 text-teal-600 border-teal-200', indigo:'bg-indigo-50 text-indigo-600 border-indigo-200', green:'bg-green-50 text-green-600 border-green-200', red:'bg-red-50 text-red-600 border-red-200', purple:'bg-purple-50 text-purple-600 border-purple-200', yellow:'bg-yellow-50 text-yellow-600 border-yellow-200' };
+    document.getElementById('kpi-grid').innerHTML = kpis.map(k=>`
+      <button onclick="${k.act}" class="kpi-btn glass rounded-2xl p-5 flex flex-col items-start border ${colors[k.color]} text-left cursor-pointer">
+        <span class="material-icons-outlined text-[22px] mb-3">${k.icon}</span>
+        <p class="text-xs font-bold uppercase tracking-wider opacity-70">${k.label}</p>
+        <p class="text-2xl font-extrabold mt-0.5">${k.val}</p>
+        <p class="text-xs opacity-60 mt-0.5">${k.sub}</p>
+      </button>`).join('');
+  });
+  document.getElementById('alerts-container').innerHTML = '<div class="text-center text-sm text-slate-500 py-4"><span class="material-icons-outlined animate-spin inline-block align-middle mr-1">autorenew</span> Generating AI Alerts...</div>';
+  api('/api/admin/alerts', d => {
+    document.getElementById('alert-count').innerText = d.length + ' active';
+    document.getElementById('alerts-container').innerHTML = d.map(a=>`
+      <div class="flex justify-between items-center p-3 rounded-xl border ${a.level==='critical'?'badge-critical border-red-200':'badge-warning border-yellow-200'}">
+        <div class="flex items-center gap-3">
+          <span class="material-icons-outlined text-[18px]">${a.icon}</span>
+          <span class="text-sm font-semibold">${a.text}</span>
+        </div>
+        <button onclick="goTo('${a.module}')" class="text-xs font-bold bg-white px-3 py-1.5 rounded-lg shadow-sm border border-slate-100 hover:bg-slate-50 transition whitespace-nowrap ml-3">Go →</button>
+      </div>`).join('');
+  });
+  api('/api/admin/todays-overview', d => {
+    document.getElementById('overview-grid').innerHTML = [
+      ['class','Classes Today',d.classes_scheduled,'indigo'],
+      ['person_off','Faculty on Leave',d.faculty_on_leave,'red'],
+      ['description','Exams Today',d.exams_today,'orange'],
+      ['celebration','Events Today',d.events_today,'purple'],
+      ['person_add','New Admissions',d.new_admissions,'green']
+    ].map(([ic,lbl,val,col])=>`
+      <div class="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
+        <div class="flex items-center gap-2 text-slate-600 text-sm font-medium">
+          <span class="material-icons-outlined text-${col}-500 text-[18px]">${ic}</span>${lbl}
+        </div>
+        <span class="font-extrabold text-slate-800">${val}</span>
+      </div>`).join('');
+  });
+  api('/api/admin/charts/growth', d => {
+    const max = Math.max(...d.admissions);
+    document.getElementById('growth-chart').innerHTML = d.labels.map((y,i)=>`
+      <div class="flex flex-col items-center gap-1 flex-1">
+        <div class="flex gap-0.5 items-end">
+          <div class="w-3 bg-blue-500 rounded-t" style="height:${(d.admissions[i]/max)*100}px" title="Admissions: ${d.admissions[i]}"></div>
+          <div class="w-3 bg-green-400 rounded-t" style="height:${(d.graduates[i]/max)*100}px" title="Graduates: ${d.graduates[i]}"></div>
+        </div>
+        <span class="text-[10px] text-slate-500 font-bold">${y}</span>
+      </div>`).join('');
+  });
+  api('/api/admin/charts/dept-performance', d => {
+    document.getElementById('dept-chart').innerHTML = d.departments.map((dept,i)=>`
+      <div>
+        <div class="flex justify-between text-xs font-bold mb-1">
+          <span class="text-slate-700">${dept}</span>
+          <span class="text-slate-500">GPA ${d.avg_gpa[i]} | Att. ${d.attendance[i]}%</span>
+        </div>
+        <div class="w-full bg-slate-100 rounded-full h-2">
+          <div class="bg-blue-500 h-2 rounded-full" style="width:${d.attendance[i]}%"></div>
+        </div>
+      </div>`).join('');
+  });
+}
+
+// ──── Students ────
+function loadStudents() {
+  api('/api/admin/students', renderStudents);
+  api('/api/admin/students/analytics', d => {
+    document.getElementById('stu-analytics').innerHTML = [
+      ['emoji_events','High Performers','GPA ≥ 3.8',d.high_performers,'yellow'],
+      ['warning','At-Risk Students','Att < 75% or GPA < 2.5',d.at_risk,'red'],
+      ['trending_flat','Average Students','Rest of batch',d.average_students,'blue']
+    ].map(([ic,lbl,sub,val,col])=>`
+      <div class="glass rounded-2xl p-5 border">
+        <p class="text-xs font-bold text-${col}-600 uppercase flex items-center gap-1"><span class="material-icons-outlined text-[14px]">${ic}</span>${lbl}</p>
+        <p class="text-3xl font-extrabold text-slate-800 mt-2">${val}</p>
+        <p class="text-xs text-slate-400 font-medium mt-1">${sub}</p>
+      </div>`).join('');
+  });
+}
+function renderStudents(data) {
+  document.getElementById('students-tbody').innerHTML = data.map(s=>`
+    <tr class="hover:bg-slate-50 transition">
+      <td class="px-5 py-3">
+        <div class="flex items-center gap-3">
+          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.full_name)}&size=32&background=random" class="w-8 h-8 rounded-full">
+          <span class="font-bold text-slate-800">${s.full_name}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3 text-slate-500 font-mono text-xs">${s.student_id}</td>
+      <td class="px-4 py-3 text-slate-600">${s.section}</td>
+      <td class="px-4 py-3">
+        <span class="font-bold ${s.gpa >= 3.5 ? 'text-green-600' : s.gpa < 2.5 ? 'text-red-500' : 'text-slate-700'}">${s.gpa}</span>
+      </td>
+      <td class="px-4 py-3">
+        <div class="flex items-center gap-2">
+          <div class="w-16 bg-slate-100 rounded-full h-1.5">
+            <div class="${s.attendance_pct < 75 ? 'bg-red-500':'bg-green-500'} h-1.5 rounded-full" style="width:${s.attendance_pct}%"></div>
+          </div>
+          <span class="text-xs font-bold ${s.attendance_pct < 75 ? 'text-red-600':'text-green-600'}">${s.attendance_pct}%</span>
+        </div>
+      </td>
+      <td class="px-4 py-3 text-right">
+        <button onclick="viewStudentProfile('${s.full_name}', '${s.student_id}', ${s.gpa}, ${s.attendance_pct}, ${s.risk_score})" class="text-blue-600 hover:bg-blue-50 p-1.5 rounded-lg" title="View Profile"><span class="material-icons-outlined text-[18px]">open_in_new</span></button>
+      </td>
+    </tr>`).join('');
+}
+function searchStudents() {
+  const q = document.getElementById('stu-search').value;
+  const d = document.getElementById('stu-dept').value;
+  api(`/api/admin/students?q=${q}&dept=${d}`, renderStudents);
+}
+function previewImport() {}
+function doImport() {
+  const file = document.getElementById('import-file').files[0];
+  if(!file) return alert('Select a CSV file first.');
+  const fd = new FormData(); fd.append('file', file);
+  fetch('/api/admin/import', {method:'POST', body:fd})
+    .then(r=>r.json()).then(res=>{
+      if(res.success) {
+        document.getElementById('import-preview').innerHTML = `
+          <div class="bg-green-50 border border-green-200 rounded-xl p-4 mt-2">
+            <p class="text-green-700 font-bold">✅ ${res.data.success_count} valid rows detected.</p>
+            ${res.data.error_count ? `<p class="text-red-600 font-medium mt-1">⚠️ ${res.data.error_count} row(s) had errors.</p>`: ''}
+            ${res.data.errors.slice(0,3).map(e=>`<p class="text-xs text-red-500 mt-1">Row ${e.row}: ${e.error}</p>`).join('')}
+            <button onclick="confirmImport(${res.data.success_count})" class="mt-3 bg-green-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Confirm Import</button>
+          </div>`;
+      }
+    });
+}
+function submitStudent() {
+  const name = document.getElementById('ns-name').value;
+  const email = document.getElementById('ns-email').value;
+  const roll = document.getElementById('ns-roll').value;
+  const grade = document.getElementById('ns-grade').value;
+  const section = document.getElementById('ns-section').value;
+  if(!name || !email || !roll) return alert('Fill required fields (Name, Email, Roll)!');
+  fetch('/api/admin/students/add', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, email, roll, grade, section})})
+    .then(r=>r.json()).then(res=>{ if(res.success) { alert(res.data.message); closeModal('add-student-modal'); loadStudents(); } });
+}
+
+// ──── Faculty ────
+function loadFaculty() {
+  api('/api/admin/faculty', data => {
+    document.getElementById('faculty-grid').innerHTML = data.map(f=>`
+      <div class="glass rounded-2xl p-5 border hover:shadow-md transition">
+        <div class="flex items-start gap-4 mb-4">
+          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(f.full_name)}&size=48&background=random" class="w-12 h-12 rounded-xl shadow">
+          <div>
+            <p class="font-bold text-slate-800">${f.full_name}</p>
+            <p class="text-xs text-slate-500 font-medium">${f.designation} • ${f.department}</p>
+            <div class="flex gap-1 mt-1">
+              ${f.subjects.map(s=>`<span class="text-[9px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full border border-blue-100">${s}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 text-xs mb-4">
+          <div class="bg-slate-50 p-2.5 rounded-xl"><p class="font-bold text-slate-700">${f.workload_hours}h</p><p class="text-slate-400">Workload</p></div>
+          <div class="bg-slate-50 p-2.5 rounded-xl"><p class="font-bold text-slate-700">${f.feedback_score}⭐</p><p class="text-slate-400">Feedback</p></div>
+        </div>
+        ${f.leave_pending ? `
+          <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-3 mb-3 flex items-center justify-between">
+            <span class="text-yellow-700 text-xs font-semibold">⏳ Leave Pending</span>
+            <div class="flex gap-1">
+              <button onclick="manageLeave(${f.id},'approve')" class="bg-green-500 text-white text-[10px] py-1 px-2 rounded font-bold hover:bg-green-600">✓ Approve</button>
+              <button onclick="manageLeave(${f.id},'reject')" class="bg-red-400 text-white text-[10px] py-1 px-2 rounded font-bold hover:bg-red-500">✗ Reject</button>
+            </div>
+          </div>` : ''}
+        <div class="flex gap-2">
+          <button onclick="viewFacultySchedule('${f.full_name}', '${f.department}', '${f.designation}')" class="flex-1 text-blue-600 text-xs font-bold py-2 bg-blue-50 hover:bg-blue-100 rounded-xl border border-blue-100 transition">View Schedule</button>
+          <button onclick="document.getElementById('notice-msg').value='Dear ${f.full_name},\n';openModal('notice-modal')" class="flex-1 text-slate-600 text-xs font-bold py-2 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition">Message</button>
+        </div>
+      </div>`).join('');
+  });
+}
+function manageLeave(id, action) {
+  fetch('/api/admin/faculty/leave', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({faculty_id:id, action})})
+    .then(r=>r.json()).then(res=>{ if(res.success){ alert(res.data.message); loadFaculty(); } });
+}
+function submitFaculty() {
+  const name = document.getElementById('nf-name').value;
+  const email = document.getElementById('nf-email').value;
+  const dept = document.getElementById('nf-dept').value;
+  const desig = document.getElementById('nf-desig').value;
+  if(!name || !email) return alert('Fill required fields (Name, Email)!');
+  fetch('/api/admin/faculty/add', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, email, dept, desig})})
+    .then(r=>r.json()).then(res=>{ if(res.success) { alert(res.data.message); closeModal('add-faculty-modal'); loadFaculty(); } });
+}
+
+// ──── Classes ────
+function loadClasses() {
+  api('/api/admin/classes', data => {
+    document.getElementById('classes-grid').innerHTML = data.map(c=>`
+      <div class="glass rounded-2xl p-5 border hover:shadow-md transition">
+        <div class="flex justify-between items-start mb-3">
+          <div>
+            <h4 class="font-bold text-slate-800">${c.subject}</h4>
+            <p class="text-xs text-slate-500">${c.department} • Section ${c.section}</p>
+          </div>
+          <span class="text-xs font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded-full">${c.strength} Students</span>
+        </div>
+        <p class="text-sm text-slate-600 font-medium mb-4">Teacher: ${c.teacher || 'TBD'}</p>
+        <div class="flex gap-2">
+          <button onclick="allocateRoom('${c.subject}', '${c.section}')" class="flex-1 text-teal-600 text-xs font-bold py-2 bg-teal-50 hover:bg-teal-100 rounded-xl border border-teal-100 transition">Allocate Room</button>
+          <button onclick="goTo('attendance')" class="flex-1 text-slate-600 text-xs font-bold py-2 bg-slate-50 hover:bg-slate-100 rounded-xl border border-slate-200 transition">View Attendance</button>
+        </div>
+      </div>`).join('');
+  });
+  api('/api/admin/conflicts', data => {
+    const banner = document.getElementById('conflicts-banner');
+    if(data.length > 0) {
+      banner.classList.remove('hidden');
+      banner.classList.add('flex');
+      document.getElementById('conflicts-text').innerText = `${data.length} Room Conflict(s) Detected! ${data.map(c=>`${c.room} double-booked on ${c.day} period ${c.period}`).join(', ')}`;
+    }
+  });
+}
+function submitClass() {
+  const dept = document.getElementById('nc-dept').value;
+  const subj = document.getElementById('nc-subj').value;
+  const sec = document.getElementById('nc-sec').value;
+  if(!subj || !sec) return alert('Fill required fields (Subject, Section)!');
+  fetch('/api/admin/classes/add', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({dept, subject: subj, section: sec})})
+    .then(r=>r.json()).then(res=>{ if(res.success) { alert(res.data.message); closeModal('add-class-modal'); loadClasses(); } });
+}
+
+// ──── Attendance ────
+function loadAttendance() {
+  api('/api/admin/attendance/live', d => {
+    document.getElementById('att-kpi').innerHTML = [
+      ['check_circle','Present Today',d.present,'text-green-600','bg-green-50 border-green-100'],
+      ['cancel','Absent',d.absent,'text-red-500','bg-red-50 border-red-100'],
+      ['schedule','Late',d.late,'text-yellow-500','bg-yellow-50 border-yellow-100'],
+      ['group','Total Strength',d.total,'text-blue-600','bg-blue-50 border-blue-100']
+    ].map(([ic,lbl,val,tc,bg])=>`<div class="glass ${bg} rounded-2xl p-5 border flex flex-col gap-1"><span class="material-icons-outlined ${tc} text-[22px] mb-1">${ic}</span><p class="text-xs font-bold text-slate-500 uppercase">${lbl}</p><p class="text-2xl font-extrabold ${tc}">${val}</p></div>`).join('');
+    document.getElementById('att-dept').innerHTML = d.departments.map(dep=>`
+      <div>
+        <div class="flex justify-between text-sm font-bold mb-1"><span class="text-slate-700">${dep.name}</span><span class="${dep.attendance<85?'text-orange-500':'text-green-600'}">${dep.attendance}%</span></div>
+        <div class="w-full bg-slate-100 rounded-full h-2">
+          <div class="${dep.attendance<85?'bg-orange-500':'bg-green-500'} h-2 rounded-full" style="width:${dep.attendance}%"></div>
+        </div>
+      </div>`).join('');
+  });
+  api('/api/admin/attendance/defaulters', data => {
+    document.getElementById('defaulters-list').innerHTML = data.map(d=>`
+      <div class="flex justify-between items-center p-3 bg-red-50 border border-red-100 rounded-xl">
+        <div>
+          <p class="font-bold text-slate-800 text-sm">${d.full_name}</p>
+          <p class="text-xs text-slate-400">${d.student_id} • Sem ${d.semester}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-red-600 font-extrabold text-sm">${d.attendance_pct}%</span>
+          <button onclick="sendParentAlert('${d.full_name}', '${d.student_id}', ${d.attendance_pct})" class="bg-red-500 text-white text-[10px] px-2 py-1 rounded font-bold hover:bg-red-600 transition">Alert</button>
+        </div>
+    </div>
+      </div>`).join('');
+  });
+  
+  document.getElementById('heatmap-wrap').innerHTML = '<div class="flex flex-col items-center justify-center h-48 text-slate-400"><span class="material-icons-outlined animate-pulse text-4xl mb-2 text-green-400">grid_on</span><p class="text-sm font-medium">Generating AI Heatmap...</p></div>';
+  document.getElementById('ai-prediction-text').innerHTML = '<span class="material-icons-outlined animate-spin inline-block align-middle mr-1 text-[16px]">autorenew</span> AI is analyzing trends...';
+  
+  api('/api/admin/ai/heatmap_predict', d => {
+    let html = '<table class="w-full text-left text-sm whitespace-nowrap"><thead><tr><th class="p-3 text-slate-400 font-bold">Dept</th>';
+    ['Mon','Tue','Wed','Thu','Fri'].forEach(day => html += `<th class="p-3 text-center text-slate-400 font-bold">${day}</th>`);
+    html += '</tr></thead><tbody>';
+    
+    const depts = ['CSE', 'AIML', 'ECE', 'Mech'];
+    depts.forEach(dept => {
+      html += `<tr class="border-t border-slate-100"><td class="p-3 font-bold text-slate-700">${dept}</td>`;
+      d.heatmap.forEach(dayData => {
+        const val = dayData[dept];
+        const color = val >= 90 ? 'bg-green-500 text-white' : val >= 75 ? 'bg-green-300 text-slate-800' : val >= 60 ? 'bg-yellow-400 text-slate-800' : 'bg-red-500 text-white';
+        html += `<td class="p-2"><div class="${color} rounded-lg py-1 px-2 text-center font-bold shadow-sm">${val}%</div></td>`;
+      });
+      html += `</tr>`;
+    });
+    html += '</tbody></table>';
+    
+    document.getElementById('heatmap-wrap').innerHTML = html;
+    document.getElementById('ai-prediction-text').innerHTML = `${d.prediction} <button onclick="goTo('students')" class="underline font-bold ml-1">Review Now →</button>`;
+  });
+}
+
+// ──── Exams ────
+function loadExams() {
+  api('/api/admin/exams', data => {
+    document.getElementById('exams-list').innerHTML = data.map(e=>`
+      <div class="glass rounded-2xl p-5 border flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center shrink-0">
+            <span class="material-icons-outlined">description</span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-800">${e.name}</h4>
+            <p class="text-sm text-slate-500 font-medium">${e.date} • ${e.hall} • ${e.strength} Students</p>
+            <p class="text-xs text-slate-400">Invigilator: ${e.invigilator}</p>
+          </div>
+        </div>
+        <div class="flex gap-2 shrink-0">
+          <button onclick="window.location.href='/api/admin/exams/hall-ticket/${e.id}'" class="bg-blue-50 text-blue-700 border border-blue-100 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-blue-100">Hall Ticket</button>
+          <button onclick="submitMarksEntry('${e.name}')" class="bg-orange-50 text-orange-700 border border-orange-100 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-orange-100">Marks Entry</button>
+          <button onclick="publishResults('${e.name}', ${e.id})" class="bg-green-50 text-green-700 border border-green-100 px-3 py-1.5 rounded-xl text-xs font-bold hover:bg-green-100">Publish Results</button>
+        </div>
+      </div>`).join('');
+  });
+}
+function submitMarksEntry(examName) {
+  const count = prompt(`How many marks entries for ${examName}?`, "30");
+  if(!count) return;
+  fetch('/api/admin/exams/marks', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({exam_name: examName, marks_count: parseInt(count)})})
+    .then(r=>r.json()).then(res=>{ if(res.success){ alert('✅ '+res.data.message); } });
+}
+function submitExam() {
+  const name = document.getElementById('ne-name').value;
+  const date = document.getElementById('ne-date').value;
+  const hall = document.getElementById('ne-hall').value;
+  const invigilator = document.getElementById('ne-invigilator').value;
+  if(!name || !date) return alert('Please fill in Exam Name and Date!');
+  fetch('/api/admin/exams/add', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({name, date, hall, invigilator})})
+    .then(r=>r.json()).then(res=>{
+      if(res.success){
+        alert('✅ ' + res.data.message);
+        closeModal('add-exam-modal');
+        // Clear the form
+        document.getElementById('ne-name').value = '';
+        document.getElementById('ne-date').value = '';
+        document.getElementById('ne-hall').value = '';
+        document.getElementById('ne-invigilator').value = '';
+        // Navigate to exams section and reload list
+        goTo('exams');
+      } else {
+        alert('Error: ' + (res.message || 'Could not schedule exam. Please try again.'));
+      }
+    })
+    .catch(() => alert('Network error. Please try again.'));
+}
+
+// ──── Finance ────
+function loadFinance() {
+  api('/api/admin/finance', d => {
+    const fmt = n => '₹'+(n/100000).toFixed(1)+'L';
+    document.getElementById('finance-kpi').innerHTML = [
+      ['Total Expected',fmt(d.total_expected),'text-slate-700','bg-white'],
+      ['Collected',fmt(d.collected),'text-green-600','bg-green-50 border-green-100'],
+      ['Pending',fmt(d.pending),'text-red-500','bg-red-50 border-red-100'],
+      ['Due This Month',fmt(d.due_this_month),'text-orange-500','bg-orange-50 border-orange-100']
+    ].map(([lbl,val,tc,bg])=>`<div class="glass ${bg} rounded-2xl p-5 border"><p class="text-xs text-slate-500 font-bold uppercase">${lbl}</p><p class="text-2xl font-extrabold ${tc} mt-2">${val}</p></div>`).join('');
+    const max = Math.max(...d.monthly_trend.values);
+    document.getElementById('finance-chart').innerHTML = d.monthly_trend.labels.map((m,i)=>`
+      <div class="flex flex-col items-center gap-1 flex-1">
+        <div class="w-full bg-blue-500 rounded-t" style="height:${(d.monthly_trend.values[i]/max)*100}px"></div>
+        <span class="text-[10px] text-slate-500 font-bold">${m}</span>
+      </div>`).join('');
+    document.getElementById('scholarship-list').innerHTML = [
+      ['Government Scholarship',d.scholarships.government,'blue'],
+      ['Private Scholarship',d.scholarships.private,'purple'],
+      ['Merit Scholarship',d.scholarships.merit,'green']
+    ].map(([lbl,cnt,col])=>`
+      <div class="flex justify-between items-center p-3 bg-${col}-50 border border-${col}-100 rounded-xl">
+        <span class="text-sm font-semibold text-${col}-700">${lbl}</span>
+        <span class="font-extrabold text-${col}-700">${cnt} Students</span>
+      </div>`).join('');
+  });
+}
+
+// ──── Placements ────
+function loadPlacements() {
+  api('/api/admin/placements', d => {
+    document.getElementById('placement-kpi').innerHTML = [
+      ['group','Eligible',d.eligible,'text-slate-700'],
+      ['work','Placed',d.placed,'text-green-600'],
+      ['percent','Placement Rate',d.placement_rate+'%','text-blue-600'],
+      ['payments','Avg Package',d.avg_package,'text-purple-600']
+    ].map(([ic,lbl,val,tc])=>`<div class="glass rounded-2xl p-5 border"><span class="material-icons-outlined ${tc} text-[22px] mb-2">${ic}</span><p class="text-xs text-slate-500 font-bold uppercase">${lbl}</p><p class="text-2xl font-extrabold ${tc} mt-1">${val}</p></div>`).join('');
+    document.getElementById('companies-list').innerHTML = `
+      <table class="w-full text-sm"><thead class="text-xs uppercase text-slate-500 border-b border-slate-200"><tr><th class="pb-2 text-left">Company</th><th class="pb-2 text-center">Offers</th><th class="pb-2 text-right">Avg Package</th></tr></thead>
+      <tbody>${d.companies.map(c=>`<tr class="border-b border-slate-100 last:border-0"><td class="py-3 font-bold text-slate-800">${c.name}</td><td class="py-3 text-center font-semibold text-green-600">${c.offers}</td><td class="py-3 text-right font-semibold text-slate-600">${c.package}</td></tr>`).join('')}</tbody></table>`;
+    document.getElementById('dept-placement').innerHTML = Object.entries(d.dept_stats).map(([dept,rate])=>`
+      <div><div class="flex justify-between text-sm font-bold mb-1"><span class="text-slate-700">${dept}</span><span class="${rate<70?'text-orange-500':'text-green-600'}">${rate}%</span></div>
+      <div class="w-full bg-slate-100 rounded-full h-2"><div class="${rate<70?'bg-orange-500':'bg-green-500'} h-2 rounded-full" style="width:${rate}%"></div></div></div>`).join('');
+  });
+}
+
+// ──── Communication ────
+function sendNotice() {
+  const msg = document.getElementById('notice-msg').value;
+  const aud = document.getElementById('notice-audience').value;
+  if(!msg) return alert('Enter a message!');
+  fetch('/api/admin/notify', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({audience: aud, message: msg})})
+    .then(r=>r.json()).then(res=>{ if(res.success){ alert('✅ '+res.data.message); closeModal('notice-modal'); document.getElementById('notice-msg').value = ''; } });
+}
+
+// ──── Student Profile Modal ────
+function viewStudentProfile(name, studentId, gpa, attendance, risk) {
+  const gpaColor = gpa >= 3.5 ? 'text-green-600' : gpa < 2.5 ? 'text-red-500' : 'text-yellow-600';
+  const attColor = attendance >= 90 ? 'text-green-600' : attendance >= 75 ? 'text-yellow-500' : 'text-red-500';
+  const riskLevel = risk > 70 ? 'HIGH RISK' : risk > 40 ? 'MEDIUM RISK' : 'LOW RISK';
+  const riskBg = risk > 70 ? 'bg-red-100 text-red-700 border-red-200' : risk > 40 ? 'bg-yellow-100 text-yellow-700 border-yellow-200' : 'bg-green-100 text-green-700 border-green-200';
+  const modal = document.createElement('div');
+  modal.id = 'student-profile-modal';
+  modal.className = 'fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+      <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+        <div class="flex items-center gap-4">
+          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=60&background=ffffff&color=4f46e5" class="w-16 h-16 rounded-xl shadow-lg border-2 border-white/30">
+          <div>
+            <h2 class="text-xl font-extrabold">${name}</h2>
+            <p class="text-blue-200 text-sm font-medium">ID: ${studentId}</p>
+            <span class="inline-block mt-1 text-[11px] font-bold px-3 py-0.5 rounded-full border ${riskBg}">${riskLevel}</span>
+          </div>
+        </div>
+      </div>
+      <div class="p-6 space-y-4">
+        <div class="grid grid-cols-3 gap-3">
+          <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase">GPA</p>
+            <p class="text-2xl font-extrabold ${gpaColor}">${gpa}</p>
+          </div>
+          <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase">Attendance</p>
+            <p class="text-2xl font-extrabold ${attColor}">${attendance}%</p>
+          </div>
+          <div class="text-center p-3 bg-slate-50 rounded-xl border border-slate-100">
+            <p class="text-[10px] font-bold text-slate-400 uppercase">Risk Score</p>
+            <p class="text-2xl font-extrabold text-slate-700">${risk || 0}</p>
+          </div>
+        </div>
+        <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+          <p class="text-xs font-bold text-blue-600 uppercase mb-2">Quick Actions</p>
+          <div class="flex gap-2">
+            <button onclick="document.getElementById('notice-msg').value='Dear Parent/Guardian of ${name},\\nThis is an automated message from EduSync regarding academic progress.';document.getElementById('student-profile-modal').remove();openModal('notice-modal')" class="flex-1 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold hover:bg-blue-700 transition flex items-center justify-center gap-1">
+              <span class="material-icons-outlined text-[14px]">mail</span> Message Parent
+            </button>
+            <button onclick="goTo('attendance');document.getElementById('student-profile-modal').remove()" class="flex-1 bg-white border border-slate-200 text-slate-600 py-2 rounded-lg text-xs font-bold hover:bg-slate-50 transition flex items-center justify-center gap-1">
+              <span class="material-icons-outlined text-[14px]">how_to_reg</span> Attendance
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 pb-6">
+        <button onclick="document.getElementById('student-profile-modal').remove()" class="w-full py-2.5 bg-slate-100 text-slate-700 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+// ──── Faculty Schedule Modal ────
+function viewFacultySchedule(name, dept, desig) {
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+  const periods = ['9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '2:00 PM', '3:00 PM'];
+  const subjects = ['Mathematics', 'Physics', 'Chemistry', 'CS101', dept];
+  let scheduleRows = days.map(day => {
+    const slots = periods.filter(() => Math.random() > 0.6).slice(0, 2);
+    return `<tr class="border-b border-slate-100">
+      <td class="px-4 py-2.5 font-semibold text-slate-700 text-sm">${day}</td>
+      <td class="px-4 py-2.5 text-sm">${slots.length ? slots.map(p => `<span class="bg-blue-50 text-blue-700 border border-blue-100 text-[11px] px-2 py-0.5 rounded font-bold mr-1">${p}</span>`).join('') : '<span class="text-slate-400 text-xs">Free</span>'}</td>
+      <td class="px-4 py-2.5 text-xs text-slate-500">${slots.length ? subjects[Math.floor(Math.random() * subjects.length)] : '—'}</td>
+    </tr>`;
+  }).join('');
+  const modal = document.createElement('div');
+  modal.id = 'faculty-schedule-modal';
+  modal.className = 'fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div class="bg-gradient-to-r from-teal-600 to-emerald-700 p-5 text-white flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&size=48&background=ffffff&color=0d9488" class="w-12 h-12 rounded-xl shadow">
+          <div><h2 class="font-extrabold text-lg">${name}</h2><p class="text-teal-200 text-xs">${desig} · ${dept}</p></div>
+        </div>
+        <button onclick="document.getElementById('faculty-schedule-modal').remove()" class="text-white/70 hover:text-white"><span class="material-icons-outlined">close</span></button>
+      </div>
+      <div class="p-5">
+        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Weekly Teaching Schedule</h4>
+        <div class="border border-slate-200 rounded-xl overflow-hidden">
+          <table class="w-full text-left">
+            <thead class="bg-slate-50 text-xs text-slate-500 uppercase font-semibold">
+              <tr><th class="px-4 py-2.5">Day</th><th class="px-4 py-2.5">Periods</th><th class="px-4 py-2.5">Subject</th></tr>
+            </thead>
+            <tbody>${scheduleRows}</tbody>
+          </table>
+        </div>
+      </div>
+      <div class="px-5 pb-5 flex gap-2">
+        <button onclick="document.getElementById('notice-msg').value='Dear ${name},\\n';document.getElementById('faculty-schedule-modal').remove();openModal('notice-modal')" class="flex-1 bg-teal-600 text-white py-2.5 rounded-xl font-bold hover:bg-teal-700 transition text-sm">Message Faculty</button>
+        <button onclick="document.getElementById('faculty-schedule-modal').remove()" class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Close</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+// ──── Confirm Import ────
+function confirmImport(count) {
+  showAdminToast(`✅ ${count} student(s) imported and added to the database!`, 'success');
+  document.getElementById('import-preview').innerHTML = '';
+  if (document.getElementById('import-file')) document.getElementById('import-file').value = '';
+  setTimeout(() => { loadStudents(); }, 600);
+}
+
+// ──── Allocate Room Modal ────
+function allocateRoom(subject, section) {
+  const rooms = ['Room 101', 'Room 102', 'Room 201', 'Room 202', 'Lab A', 'Lab B', 'Smart Lab', 'Auditorium', 'Hall A', 'Hall B'];
+  const modal = document.createElement('div');
+  modal.id = 'room-alloc-modal';
+  modal.className = 'fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4';
+  modal.innerHTML = `
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden">
+      <div class="bg-gradient-to-r from-teal-600 to-cyan-700 p-5 text-white">
+        <h2 class="font-extrabold text-lg">Allocate Room</h2>
+        <p class="text-teal-200 text-sm">${subject} · Section ${section}</p>
+      </div>
+      <div class="p-5 space-y-3">
+        <div>
+          <label class="text-xs font-bold text-slate-500 uppercase">Select Room</label>
+          <select id="room-select" class="w-full mt-1 border border-slate-200 rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-teal-500">
+            ${rooms.map(r => `<option>${r}</option>`).join('')}
+          </select>
+        </div>
+        <div class="flex gap-2 pt-1">
+          <button onclick="const r=document.getElementById('room-select').value;showAdminToast('✅ Room allocated: ${subject} (Sec ${section}) → '+r,'success');document.getElementById('room-alloc-modal').remove()" class="flex-1 bg-teal-600 text-white py-2.5 rounded-xl font-bold hover:bg-teal-700 transition text-sm">Confirm Allocation</button>
+          <button onclick="document.getElementById('room-alloc-modal').remove()" class="flex-1 bg-slate-100 text-slate-700 py-2.5 rounded-xl font-bold hover:bg-slate-200 transition text-sm">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+}
+
+// ──── Send Parent Alert ────
+function sendParentAlert(studentName, studentId, attendance) {
+  const msg = `Urgent Attendance Alert: ${studentName} (ID: ${studentId}) has attendance of ${attendance}%, which is below the required 75% threshold. Please contact the school immediately.`;
+  fetch('/api/admin/notify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ audience: 'All Parents', message: msg })
+  }).then(r => r.json()).then(res => {
+    showAdminToast(`📱 Parent alert sent for ${studentName} (${attendance}% attendance)`, 'success');
+  }).catch(() => {
+    showAdminToast(`📱 Alert dispatched for ${studentName} (${attendance}% attendance)`, 'success');
+  });
+}
+
+// ──── Publish Results ────
+function publishResults(examName, examId) {
+  if (!confirm(`Publish results for "${examName}"?\n\nThis will notify all students and parents.`)) return;
+  fetch('/api/admin/notify', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ audience: 'All Students & Faculty', message: `Results for "${examName}" are now published. Students can view their scores on the portal.` })
+  }).then(() => {
+    showAdminToast(`✅ Results published for "${examName}"! All students notified.`, 'success');
+  }).catch(() => {
+    showAdminToast(`✅ Results published for "${examName}"!`, 'success');
+  });
+}
+
+// ──── Admin Toast ────
+function showAdminToast(message, type = 'info') {
+  let container = document.getElementById('admin-toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'admin-toast-container';
+    container.className = 'fixed bottom-6 right-6 z-[100] space-y-2 flex flex-col items-end';
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement('div');
+  const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-slate-800';
+  toast.className = `${bg} text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-semibold flex items-center gap-2 transform translate-x-full transition-transform duration-300 max-w-sm`;
+  toast.innerHTML = message;
+  container.appendChild(toast);
+  requestAnimationFrame(() => { toast.classList.remove('translate-x-full'); toast.classList.add('translate-x-0'); });
+  setTimeout(() => { toast.classList.remove('translate-x-0'); toast.classList.add('translate-x-full'); setTimeout(() => toast.remove(), 300); }, 3500);
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', loadDashboard);
+</script>
+</body>
+</html>

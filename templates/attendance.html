@@ -1,0 +1,505 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>EduSync – Attendance Automation Panel</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;family=Roboto:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .qr-ring-animation {
+            stroke-dasharray: 283;
+            stroke-dashoffset: 0;
+            animation: countdown 30s linear infinite;
+        }
+        @keyframes countdown {
+            from { stroke-dashoffset: 0; }
+            to { stroke-dashoffset: 283; }
+        }
+        .camera-scanner-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #1a73e8, transparent);
+            animation: scan 3s ease-in-out infinite;
+        }
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "on-background": "#181c20",
+                        "on-error-container": "#93000a",
+                        "tertiary-container": "#a06d00",
+                        "primary-fixed": "#d8e2ff",
+                        "surface": "#f7f9ff",
+                        "tertiary-fixed-dim": "#ffba45",
+                        "outline": "#727785",
+                        "on-surface": "#181c20",
+                        "surface-variant": "#dfe3e8",
+                        "on-secondary-fixed-variant": "#3f4752",
+                        "primary-container": "#1a73e8",
+                        "inverse-primary": "#adc7ff",
+                        "inverse-surface": "#2d3135",
+                        "on-tertiary-container": "#0a0400",
+                        "surface-container-low": "#f1f4fa",
+                        "on-primary-container": "#ffffff",
+                        "background": "#f7f9ff",
+                        "surface-container-high": "#e5e8ee",
+                        "tertiary-fixed": "#ffddb0",
+                        "error-container": "#ffdad6",
+                        "error": "#ba1a1a",
+                        "primary": "#005bbf",
+                        "primary-fixed-dim": "#adc7ff",
+                        "inverse-on-surface": "#eef1f7",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#c1c6d6",
+                        "on-secondary-fixed": "#141c26",
+                        "on-primary-fixed": "#001a41",
+                        "on-secondary-container": "#5d6571",
+                        "secondary": "#575f6b",
+                        "secondary-fixed": "#dbe3f1",
+                        "on-primary-fixed-variant": "#004493",
+                        "on-tertiary-fixed": "#281800",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "tertiary": "#805600",
+                        "surface-container": "#ebeef4",
+                        "surface-tint": "#005bc0",
+                        "surface-dim": "#d7dae0",
+                        "surface-bright": "#f7f9ff",
+                        "secondary-fixed-dim": "#bfc7d4",
+                        "secondary-container": "#dbe3f1",
+                        "on-surface-variant": "#414754",
+                        "surface-container-highest": "#dfe3e8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "margin-mobile": "16px",
+                        "xs": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "32px",
+                        "md": "16px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Roboto"],
+                        "body-md": ["Roboto"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-sm-mobile": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "title-md": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Roboto"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                        "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-sm-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.15px", "fontWeight": "600"}],
+                        "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="flex justify-between items-center px-margin-desktop w-full sticky top-0 z-50 bg-surface-container-lowest dark:bg-surface-dim h-16 shadow-sm border-b border-outline-variant dark:border-outline">
+<div class="flex items-center gap-4">
+<span class="font-headline-sm text-headline-sm font-bold text-primary dark:text-primary-fixed-dim">EduSync</span>
+<div class="hidden md:flex gap-6 ml-8">
+<a class="font-title-md text-title-md text-primary border-b-2 border-primary pb-1 transition-colors" href="/dashboard">Dashboard</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-primary transition-colors" href="/dashboard">Classes</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-primary transition-colors" href="/analytics">Reports</a>
+</div>
+</div>
+<div class="flex items-center gap-md">
+<div class="relative hidden sm:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-md focus:ring-2 focus:ring-primary w-64" placeholder="Search students..." type="text">
+</div>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full duration-200">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full duration-200">settings</button>
+<img alt="User profile avatar" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8yu70V8u0Na9KVOQ3fveP5i336X2U2bvuo40WhNOQD9TAJe0Sh62GPhLlmFAUCxoRciPvC76cLagcNBu1XyB7x5s5LBTQgswNs4ZyTwRLqacW2FKAsplkk-BYoq5T3lcpcZPqciMumtzD3Ce2iUWn1OHPj7oypVPPBOz6w9kHLgzH5qnNnzl8Wky0d_m8E2m8_7OkbYt0QpPmqAr_ukOOl0KkYlH55afGVCEReRIzGFLPabDW1ywMp2EidObUTDXqT0KLu4-MJdbb">
+</div>
+</header>
+<div class="flex min-h-[calc(100vh-64px)]">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-[calc(100vh-64px)] border-r border-outline-variant dark:border-outline p-md w-[280px] hidden md:flex flex-col bg-surface-container-low dark:bg-surface-container-high">
+<div class="mb-lg flex items-center gap-3 px-2">
+<div class="w-10 h-10 bg-primary-container rounded-lg flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined">school</span>
+</div>
+<div>
+<h2 class="font-title-md text-title-md text-on-surface">Main Campus</h2>
+<p class="text-label-lg font-label-lg text-on-surface-variant">Academic Year 2024</p>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-lg font-bold transition-all scale-98 active:scale-95 duration-150" href="/dashboard">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-lg text-label-lg">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/dashboard">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-lg text-label-lg">Classes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/dashboard">
+<span class="material-symbols-outlined">group</span>
+<span class="font-label-lg text-label-lg">Students</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/attendance">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="font-label-lg text-label-lg">Attendance</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/analytics">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label-lg text-label-lg">Reports</span>
+</a>
+</nav>
+<button class="mt-4 w-full py-3 bg-primary text-on-primary rounded-lg font-bold hover:shadow-lg transition-shadow flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">add</span> New Class
+            </button>
+<div class="mt-auto pt-4 border-t border-outline-variant">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/dashboard">
+<span class="material-symbols-outlined">help</span>
+<span class="font-label-lg text-label-lg">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all" href="/logout">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label-lg text-label-lg">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 md:ml-[280px] p-margin-mobile md:p-margin-desktop pb-32">
+<!-- Page Header & Mode Toggle -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-lg">
+<div>
+<h1 class="font-headline-md text-headline-md text-on-surface">Attendance Automation</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Class: Advanced Physics — Room 402</p>
+</div>
+<div class="flex p-1 bg-surface-container-high rounded-xl">
+<button class="px-4 py-2 rounded-lg text-label-lg font-label-lg transition-all text-on-surface-variant hover:bg-surface-container-highest" id="btn-manual" onclick="switchMode('manual')">Manual</button>
+<button class="px-4 py-2 rounded-lg text-label-lg font-label-lg transition-all bg-surface-container-lowest text-primary shadow-sm font-bold" id="btn-qr" onclick="switchMode('qr')">QR Scan</button>
+<button class="px-4 py-2 rounded-lg text-label-lg font-label-lg transition-all text-on-surface-variant hover:bg-surface-container-highest" id="btn-face" onclick="switchMode('face')">Face Recognition</button>
+<button class="px-4 py-2 rounded-lg text-label-lg font-label-lg transition-all text-on-surface-variant hover:bg-surface-container-highest" id="btn-rfid" onclick="switchMode('rfid')">RFID</button>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Center Work Area -->
+<div class="lg:col-span-8 space-y-gutter">
+<!-- QR Mode Display (Visible by Default) -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col items-center text-center" id="mode-qr">
+<div class="relative w-64 h-64 mb-6">
+<!-- SVG Countdown Ring -->
+<svg class="absolute inset-0 w-full h-full -rotate-90">
+<circle class="text-surface-container-high" cx="128" cy="128" fill="transparent" r="120" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary qr-ring-animation" cx="128" cy="128" fill="transparent" r="120" stroke="currentColor" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<!-- Placeholder QR -->
+<div class="absolute inset-4 bg-white flex items-center justify-center rounded-lg border border-outline-variant p-2 overflow-hidden">
+<img alt="QR Code for Attendance" class="w-full h-full object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDMw-ZvRBBIetJSPURqkGdPx61G-J8JpYEj7KK1e75HR7efAJzlus9cTLNQhuRlfMojKHtubHjsLjH2AkdWsqHLEXZwxHgNL3QijHUCyXdoDgC71feRbqKOIcS4DHJ92tuj6BDjE8iaIuS4CiDA410SQd0ocS3aWf2i5fEf94cbiUmxMi74xBmP-gVsA4h_RKoqeZB9TP72WuNn4ntrSsdu1nXUsySttgv1GY5QhroGx2oO7jggS-OiPEkVjhYNQ2j-8t3q8Nc7SxJu">
+</div>
+</div>
+<h3 class="font-title-lg text-title-lg text-on-surface mb-2">Scan to Mark Presence</h3>
+<p class="text-body-md text-on-surface-variant max-w-sm mb-6">Code expires in <span class="font-bold text-primary">00:24</span>. Students must be within 50m of classroom geofence.</p>
+<div class="flex items-center gap-3 w-full max-w-md bg-surface-container-low p-3 rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-primary">link</span>
+<span class="text-body-md truncate flex-1">edusync.io/join/ph-402-2024</span>
+<button class="text-primary font-bold text-label-lg px-3 py-1 hover:bg-primary-container/10 rounded transition-colors">COPY</button>
+</div>
+<!-- Scan Log Table -->
+<div class="w-full mt-12 text-left">
+<div class="flex items-center justify-between mb-4">
+<h4 class="font-title-md text-title-md text-on-surface">Recent Activity</h4>
+<span class="text-label-lg font-label-lg text-on-surface-variant">12 Scans detected</span>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-body-md">
+<thead>
+<tr class="border-b border-outline-variant text-on-surface-variant font-label-lg">
+<th class="py-3 font-medium text-left">Student</th>
+<th class="py-3 font-medium text-left">Timestamp</th>
+<th class="py-3 font-medium text-left">Device</th>
+<th class="py-3 font-medium text-right">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 flex items-center gap-3">
+<img alt="Freyan avatar" class="w-8 h-8 rounded-full bg-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAjzn35_E2GwSG4Z05MtzM0MhmT40re6wUPAApzHsV8xuf7ypp-ImpjWMEwyaLOZO-Pfss2TXycyzoSxKoyO5eArLHJzWRIk8beGI-fMC_aN55bOwvVUCSZrQWctQ4M_kTRFKcqn2-WJZjMysCgM5ycPwBnhwC_aRzu4WCsDYG8ahTQJRTXqq58urBtOC_gOaKIDUlH02673Apv9j7KEcD5sOLv9r5DCzy7YCqI9omQehAhs7JYxvKk1bQtPRDOZ4BNvBfaCJbQRZuW">
+<span class="font-medium">Freyan</span>
+</td>
+<td class="py-3 text-on-surface-variant">10:02:14 AM</td>
+<td class="py-3 text-on-surface-variant">iPhone 15 Pro</td>
+<td class="py-3 text-right">
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">VERIFIED</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="py-3 flex items-center gap-3">
+<img alt="Manish avatar" class="w-8 h-8 rounded-full bg-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAghXIzpSJ1gdA90O3sqoq4S_EmQv2nhyhYocAfnFpLOMSEAdkOd-2IHhOy1YpYvd6amSY4sfM4iukIGuySb6yZ-bmmMKFRwEsF7JgYm0vkM6DWU5k2QuiTOLyTkstCABwpdDuKE4PMMV_KX56vKIaHnidf4CvKX5pebemo11v1vfy3DOw_nwNyCBlbk8WiNO71C9pV5Fmdp_LooyHEtlqYM3pE5ReXd6GdUVf8ByUvK6PEXSiwrx74_70YD4MBKnsSify-iv5WfuBO">
+<span class="font-medium">Manish</span>
+</td>
+<td class="py-3 text-on-surface-variant">10:01:58 AM</td>
+<td class="py-3 text-on-surface-variant">Samsung S23</td>
+<td class="py-3 text-right">
+<span class="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-bold">VERIFIED</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Face Recognition Mode (Hidden by default) -->
+<div class="hidden bg-surface-container-lowest border border-outline-variant rounded-xl p-lg" id="mode-face">
+<div class="relative aspect-video bg-black rounded-lg overflow-hidden border-2 border-primary/30 mb-lg">
+<img class="w-full h-full object-cover opacity-60" data-alt="A wide-angle high-resolution shot of a modern, bright university classroom filled with diverse students. One student in the foreground is clearly in focus, while others sit at their desks in a soft bokeh background. Overlaid on the image is a translucent blue digital HUD containing glowing rectangular bounding boxes around student faces and floating percentage text labels, creating a futuristic biometric facial recognition interface aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAXVa4WgFzZk52VzuZ7ODQsrNtaCX2T5vCa-79tP1ugx7ezE6qTLtYcTJdYxSuyhNevFZc2NKitz_gAzlImoobjv3yFBsyndAiQ-MiytEEs2QLR7xC2nLrY-5o2gr8D0Oa8pI8cOhDbgd3V9m8hLk9u8IyxgtmuO_F0jS2Ts0vkZZjdXH3eVLNiOJi9V5GDj5NCY8SPUhSHTwHS1iirMr1aF6yX19zAp9xk6fgCLgHWoS3C0Bg1cyTmeej6QSC5X5TTPfglLESM6Gou">
+<!-- Bounding Box Overlays -->
+<div class="absolute top-[20%] left-[30%] w-[12%] h-[20%] border-2 border-primary rounded-sm shadow-[0_0_15px_rgba(26,115,232,0.5)]">
+<div class="absolute -top-6 left-0 bg-primary text-white text-[10px] px-1 font-bold">98.2% CONFIDENCE</div>
+</div>
+<div class="absolute top-[25%] left-[55%] w-[10%] h-[18%] border-2 border-primary/50 rounded-sm">
+<div class="absolute -top-6 left-0 bg-primary/50 text-white text-[10px] px-1 font-bold">94.1% MATCH</div>
+</div>
+<!-- Scanning Line -->
+<div class="absolute left-0 w-full camera-scanner-line"></div>
+<!-- Live Indicator -->
+<div class="absolute top-4 right-4 flex items-center gap-2 bg-black/50 text-white px-3 py-1 rounded-full text-label-lg">
+<span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span> LIVE FEED
+                            </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant flex items-center gap-4">
+<img alt="Julian" class="w-12 h-12 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUpVwdWp75mj0jYz24uLBOwF_6ZhgrXcAfW1NI9Y-zo9ZXhAlm1zP4JYltgmZy8yfum42AqjYJ9xaXzU33ezMlghtYfmOXXhgBMkEqUrch-iunTZ0VLC5EnQFMGe0ruhsV1kDNn1oNt4Oas3yD9G9epMGDrCjBsqwejEHFejJBd8svKSmU_LL-K0TzgfJLnq0wy8eI76B_aFwLXYhkVUdd5_NnDlWLzAsuAvboKfKoRs5qd_9vsv4eMZw6dxEiKR7OEFLhBZzJXt_F">
+<div class="flex-1">
+<h5 class="font-bold">Julian Casablancas</h5>
+<span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-bold">98% Confidence</span>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-error-container text-error rounded-full hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="p-2 bg-primary text-on-primary rounded-full hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+</div>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant flex items-center gap-4">
+<img alt="Sia" class="w-12 h-12 rounded-lg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk55t_ZxwuZZqMs0TVUvbKclQOhZg5YmNnhAg-QjPMQRZVIaOs9s6JgDo82gS2ulUBU7Z_6lSTu9ZE0AQ2t-QQ-rOeH2-mwVi2zgNwTC5WYy2VRbwmqW3ZCF1JlEx7ahFQ8Zuzaxs-A4RPpDhkef6U2aZ06QW1Z4vKS11CZVXHMz93fPORFcxhGhYwT572HGrBQKIBpJeUHZ9pG2LZojEHI6xSqfUtYqCb6beFNDi_HrI94Ug3svd7KOKGvgeCXaYcqf-fSIEQthwN">
+<div class="flex-1">
+<h5 class="font-bold">Sia Furler</h5>
+<span class="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded font-bold">92% Confidence</span>
+</div>
+<div class="flex gap-2">
+<button class="p-2 bg-error-container text-error rounded-full hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+<button class="p-2 bg-primary text-on-primary rounded-full hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-[18px]">check</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Student List -->
+<div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-xl flex flex-col max-h-[700px]">
+<div class="p-md border-b border-outline-variant sticky top-0 bg-surface-container-lowest rounded-t-xl z-10">
+<div class="flex items-center justify-between mb-4">
+<h3 class="font-title-md text-title-md text-on-surface">Class Roster</h3>
+<span class="text-label-lg font-label-lg bg-surface-container-high px-2 py-1 rounded">24/32 present</span>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px]">filter_list</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-lg text-body-md focus:ring-1 focus:ring-primary" placeholder="Filter by status..." type="text">
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-2 space-y-1"><!-- Student Item -->
+<div class="flex items-center gap-3 p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+    <div class="relative">
+        <img alt="Manvith" class="w-10 h-10 rounded-full bg-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7wgO-fluEM-ztf-G9g_sUn4Mbjvw1qBpqEwCVk4WiPWrD9lTzw_cVnvDfCiflDUfNUOKYyUXPsTcCVGQQIaDnQUK7n9PJII2WbqIlRRASyCO6VGEtVtP_8DBOODdgiotYJkjvNCcCzOLn1uWHvmEQSjpkABwDAOcXXGD0WErpqPsam2sqrYkYx223qVvjxvDRzZXmuORIh-5icFWs096ZTTTntrIHA_37Gj-lkBCipz4ipp9HU7ifefViq6Q02OJ3NR1MWPqa1pkD">
+        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+    </div>
+    <div class="flex-1">
+        <h4 class="font-bold text-body-md">Manvith</h4>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span> 12 DAYS
+            </span>
+        </div>
+    </div>
+    <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 focus:outline-none ring-2 ring-offset-2 ring-transparent">
+        <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+    </button>
+</div>
+<!-- Student Item -->
+<div class="flex items-center gap-3 p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+    <div class="relative">
+        <img alt="Shawn" class="w-10 h-10 rounded-full bg-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5mNvaCnd0RAVtWn6hdeX3R-EL6Kx8kKg7Mg1WxlYd5VW0Vc_wOttEAr83Op0jvEKXxTTvIx9ly_IYyz3zwQQCzwldSN9a_Xz-4mWNeOY0qCABnvQKHO_tewjDnAgp3kwTOIDL8W1gQeNA6KiYjgx-o0gPTiisV9t8F9EV2_xxPN0Z4sKPXT8uf3rtRDL9BHsVN8hrN41QsckbSpChS_QLRHjy7U9xrA8M8vOnzuMdd9_Y0TzEHpiyQgq54LFlPd0zlVhFVzC-I_np">
+        <span class="absolute bottom-0 right-0 w-3 h-3 bg-outline-variant border-2 border-white rounded-full"></span>
+    </div>
+    <div class="flex-1">
+        <h4 class="font-bold text-body-md">Shawn</h4>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-blue-600 bg-blue-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">local_fire_department</span> 5 DAYS
+            </span>
+        </div>
+    </div>
+    <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-surface-container-highest transition-colors duration-200 focus:outline-none ring-2 ring-offset-2 ring-transparent">
+        <span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+    </button>
+</div>
+<!-- Student Item -->
+<div class="flex items-center gap-3 p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+    <div class="relative">
+        <img alt="Neil" class="w-10 h-10 rounded-full bg-surface-container-high" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0vr_wVRb0XZGgik5ERw6QS8slpuYaVPqASfDgCo1SR_ZmPoUBF48ntIahAGP7IKtJLErVmYtJ38kPxkOzpDoj_Hkw1_dfjJC9K4zgZx0zXp0ehVD9HqGwPipOiFta29-abH3yYithn6eZ0Pg_LhnVsZoouwfwxJXPl82kC_bWoQf_4NOa2tRvlArFbbu5-gveQwls_G10pGTsbQtz-rXarXCLRV8u01UK8p_QQ7sVE8jtGS8keKpjRx362PSnjW736ErI1IoKYhPW">
+        <span class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></span>
+    </div>
+    <div class="flex-1">
+        <h4 class="font-bold text-body-md">Neil</h4>
+        <div class="flex items-center gap-2">
+            <span class="text-[10px] font-bold text-red-600 bg-red-100 px-1.5 py-0.5 rounded flex items-center gap-1">
+                <span class="material-symbols-outlined text-[12px]">warning</span> RISK
+            </span>
+        </div>
+    </div>
+    <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-primary transition-colors duration-200 focus:outline-none ring-2 ring-offset-2 ring-transparent">
+        <span class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+    </button>
+</div>
+<script>
+    const names = ["Roydon", "Melrick", "Sohan", "Bitto", "Hannah", "Isaac", "Jasmine", "Kevin", "Lara"];
+    names.forEach(name => {
+        document.write(`
+        <div class="flex items-center gap-3 p-3 hover:bg-surface-container-low rounded-lg transition-colors group">
+            <div class="relative">
+                <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=${name}" class="w-10 h-10 rounded-full bg-surface-container-high" alt="${name}">
+                <span class="absolute bottom-0 right-0 w-3 h-3 bg-outline-variant border-2 border-white rounded-full"></span>
+            </div>
+            <div class="flex-1">
+                <h4 class="font-bold text-body-md">${name}</h4>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-bold text-on-surface-variant bg-surface-container-high px-1.5 py-0.5 rounded">REGULAR</span>
+                </div>
+            </div>
+            <button class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-surface-container-highest transition-colors duration-200 focus:outline-none ring-2 ring-offset-2 ring-transparent">
+                <span class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+            </button>
+        </div>
+        `);
+    });
+</script></div>
+</div>
+</div>
+</main>
+</div>
+<!-- Persistent Sticky Footer: Bulk Actions -->
+<footer class="fixed bottom-0 left-0 right-0 bg-surface-container-lowest border-t border-outline-variant px-margin-mobile md:px-margin-desktop py-4 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 text-primary font-bold text-label-lg bg-primary/10 px-4 py-2 rounded-lg">
+<span class="material-symbols-outlined">check_circle</span>
+                    8 Selected
+                </div>
+<button class="text-on-surface-variant font-bold text-label-lg hover:text-primary transition-colors">Clear Selection</button>
+</div>
+<div class="flex flex-wrap gap-3">
+<button class="px-6 py-2 border border-outline-variant text-on-surface rounded-lg font-bold hover:bg-surface-container-low transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">download</span> Export CSV
+                </button>
+<button class="px-6 py-2 border border-error text-error rounded-lg font-bold hover:bg-error/5 transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">send</span> Send absence alert
+                </button>
+<button class="px-6 py-2 bg-primary text-on-primary rounded-lg font-bold hover:shadow-lg transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">done_all</span> Mark all present
+                </button>
+</div>
+</div>
+</footer>
+<!-- Mobile Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-[60] flex justify-around items-center px-4 py-2 bg-surface-container-lowest dark:bg-surface-dim border-t border-outline-variant dark:border-outline shadow-lg md:hidden">
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">class</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Classes</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_available</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Attendance</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-lg-mobile text-label-lg-mobile">Profile</span>
+</div>
+</nav>
+<script>
+        function switchMode(mode) {
+            // UI elements
+            const qrView = document.getElementById('mode-qr');
+            const faceView = document.getElementById('mode-face');
+            const buttons = ['manual', 'qr', 'face', 'rfid'];
+
+            // Reset buttons
+            buttons.forEach(b => {
+                const btn = document.getElementById(`btn-${b}`);
+                btn.classList.remove('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'font-bold');
+                btn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-highest');
+            });
+
+            // Set active button
+            const activeBtn = document.getElementById(`btn-${mode}`);
+            activeBtn.classList.add('bg-surface-container-lowest', 'text-primary', 'shadow-sm', 'font-bold');
+            activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-highest');
+
+            // Toggle views
+            if (mode === 'qr') {
+                qrView.classList.remove('hidden');
+                faceView.classList.add('hidden');
+            } else if (mode === 'face') {
+                qrView.classList.add('hidden');
+                faceView.classList.remove('hidden');
+            } else {
+                // For demo simplicity, just show empty work state for others
+                qrView.classList.add('hidden');
+                faceView.classList.add('hidden');
+            }
+        }
+    </script>
+
+
+</body></html>

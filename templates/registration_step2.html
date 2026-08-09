@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Student Registration - Academic Details | EduSync</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface": "#f7f9ff",
+                        "inverse-on-surface": "#eef1f7",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffba45",
+                        "primary-container": "#1a73e8",
+                        "surface-variant": "#dfe3e8",
+                        "tertiary-container": "#a06d00",
+                        "primary-fixed-dim": "#adc7ff",
+                        "secondary-fixed": "#dbe3f1",
+                        "primary": "#005bbf",
+                        "on-secondary-fixed": "#141c26",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "on-background": "#181c20",
+                        "on-primary-container": "#ffffff",
+                        "secondary-container": "#dbe3f1",
+                        "surface-container-high": "#e5e8ee",
+                        "error": "#ba1a1a",
+                        "tertiary": "#805600",
+                        "outline": "#727785",
+                        "surface-dim": "#d7dae0",
+                        "on-secondary-container": "#5d6571",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f1f4fa",
+                        "on-surface-variant": "#414754",
+                        "on-primary-fixed": "#001a41",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#adc7ff",
+                        "on-tertiary-container": "#0a0400",
+                        "surface-container-highest": "#dfe3e8",
+                        "surface-container": "#ebeef4",
+                        "tertiary-fixed": "#ffddb0",
+                        "surface-tint": "#005bc0",
+                        "on-primary-fixed-variant": "#004493",
+                        "surface-bright": "#f7f9ff",
+                        "background": "#f7f9ff",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#575f6b",
+                        "on-tertiary-fixed": "#281800",
+                        "on-secondary-fixed-variant": "#3f4752",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2d3135",
+                        "secondary-fixed-dim": "#bfc7d4",
+                        "outline-variant": "#c1c6d6",
+                        "on-surface": "#181c20"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Roboto"],
+                        "headline-sm-mobile": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Roboto"],
+                        "title-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Roboto"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "headline-sm-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.15px", "fontWeight": "600"}],
+                        "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                        "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { background-color: #f7f9ff; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .step-active { background-color: #005bbf; color: #ffffff; }
+        .step-complete { background-color: #1a73e8; color: #ffffff; }
+        .step-inactive { background-color: #dfe3e8; color: #414754; }
+        .form-card { 
+            background: #ffffff; 
+            box-shadow: 0px 2px 4px rgba(0,0,0,0.05); 
+            border: 1px solid #E0E0E0;
+            transition: box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .form-card:hover {
+            box-shadow: 0px 8px 16px rgba(0,0,0,0.08);
+            border-color: #005bbf;
+        }
+        .upload-zone {
+            border: 2px dashed #c1c6d6;
+            transition: all 0.2s ease;
+        }
+        .upload-zone:hover {
+            border-color: #005bbf;
+            background-color: #f1f4fa;
+        }
+    </style>
+</head>
+<body class="font-body-md text-on-background min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50 bg-surface-container-lowest dark:bg-surface-dim border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="text-title-lg font-title-lg font-bold text-primary dark:text-primary-fixed-dim">EduSync</div>
+<div class="hidden md:flex gap-xl items-center">
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-lg text-label-lg hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="/admin">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-lg text-label-lg" href="/admin">Students</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-lg text-label-lg hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="/admin">Faculty</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant font-label-lg text-label-lg hover:text-primary dark:hover:text-primary-fixed-dim transition-colors" href="/analytics">Reports</a>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant">settings</button>
+<div class="w-8 h-8 rounded-full overflow-hidden border border-outline-variant">
+<img alt="Administrator Profile" data-alt="A professional portrait of a school administrator in a clean minimalist style, wearing business casual attire with a soft blue background that matches the educational platform branding. High-key lighting highlights the friendly but authoritative expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXn6ilprWoSVj-SjPSGqhBDUy3VB00yV5DWMWZJDsz1WYgk4_Trbtot3peCw8NHT5TxgwSQmosKaqxzdY0JqyVS9f0DcJGi6qsG7Xl5Gu7-GWIaPdcm2jR_stfuPeDuTfDy2SPa_3fdAK2Kk3eLN2cGmNfDIKJ0JW38EthQYkpkU9Nbyr_rkEVeZSZnN6gjlVVcyvlz2gkD_ag2p08_E6de-dX3sg4MHjHMgTecbL5MnA-t0r6rVLLRNf_Z8EX_6zw-Zsh3qGR76qD"/>
+</div>
+</div>
+</header>
+<main class="flex-grow w-full max-w-5xl mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Registration Progress Stepper -->
+<section class="mb-xl">
+<div class="flex items-center justify-between max-w-3xl mx-auto relative">
+<!-- Stepper Line -->
+<div class="absolute top-5 left-0 w-full h-[2px] bg-surface-variant -z-10">
+<div class="h-full bg-primary" style="width: 33%;"></div>
+</div>
+<!-- Step 1: Complete -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-10 h-10 rounded-full flex items-center justify-center step-complete shadow-sm">
+<span class="material-symbols-outlined text-[20px]">check</span>
+</div>
+<span class="font-label-lg text-label-lg text-primary">Personal Details</span>
+</div>
+<!-- Step 2: Active -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-10 h-10 rounded-full flex items-center justify-center step-active shadow-md ring-4 ring-primary-fixed">
+<span class="font-bold">2</span>
+</div>
+<span class="font-label-lg text-label-lg text-primary font-bold">Academic Details</span>
+</div>
+<!-- Step 3: Inactive -->
+<div class="flex flex-col items-center gap-sm">
+<div class="w-10 h-10 rounded-full flex items-center justify-center step-inactive">
+<span>3</span>
+</div>
+<span class="font-label-lg text-label-lg text-on-surface-variant">Review &amp; Submit</span>
+</div>
+</div>
+</section>
+<!-- Form Content -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Info Panel -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<div class="form-card rounded-xl p-lg bg-surface-container-low">
+<h2 class="font-headline-sm text-headline-sm text-primary mb-md">Academic Path</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                        Define the student's learning journey. Accurate academic history helps us tailor the educational support and placement.
+                    </p>
+<div class="flex items-start gap-md p-md bg-white rounded-lg border border-outline-variant">
+<span class="material-symbols-outlined text-tertiary">info</span>
+<p class="font-body-md text-body-md">Transcripts must be in PDF or JPEG format and under 5MB.</p>
+</div>
+</div>
+<img class="rounded-xl object-cover h-48 w-full shadow-sm" data-alt="A clean, bright classroom library featuring neatly organized books on light wood shelves under soft natural sunlight. The atmosphere is quiet, inspiring, and professional, utilizing a primary blue and white color scheme to evoke a sense of trust and educational excellence." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQ7Iv9XCqR_XpZ99AYpkiwCsryKd8eHURg_BIvGavopJmArTQeqTxFPuuu95CDL-5rVAxkdBz9NtSG2OKK1rgaNnboxxqPC8UHwx8s8gXMOdUML4lafH1loUO9ZiyOssq5eqoIMAm6o7uh1anKp__WV1rzGRs3Kd6iXhp9hAgRhS9AiOlj4KHHfxbeae0RUr5CedOLcxh22YJfSVE-rMQO_ybBwIQFmr3ZOmC6Hfc9QqlafOSpHluYpc4-ivJzreY-q4sC09H89Cw3"/>
+</div>
+<!-- Main Form Column -->
+<div class="lg:col-span-8">
+<form class="flex flex-col gap-lg">
+<div class="form-card rounded-xl p-lg flex flex-col gap-xl">
+<!-- Grade & School -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1">Grade / Level *</label>
+<select class="h-12 px-md border border-outline rounded-lg focus:border-primary focus:ring-2 focus:ring-primary-fixed outline-none bg-white font-body-md">
+<option>Select Level</option>
+<option>Grade 9 (Freshman)</option>
+<option>Grade 10 (Sophomore)</option>
+<option>Grade 11 (Junior)</option>
+<option>Grade 12 (Senior)</option>
+</select>
+</div>
+<div class="flex flex-col gap-xs">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1">Previous School Name</label>
+<input class="h-12 px-md border border-outline rounded-lg focus:border-primary focus:ring-2 focus:ring-primary-fixed outline-none font-body-md" placeholder="Enter school name" type="text"/>
+</div>
+</div>
+<!-- Preferred Subjects (Multi-selection style) -->
+<div class="flex flex-col gap-md">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1">Preferred Subjects / Electives</label>
+<div class="grid grid-cols-2 md:grid-cols-3 gap-sm">
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">Advanced Math</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">Computer Science</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">Creative Arts</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">Biology</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">World History</span>
+</label>
+<label class="flex items-center gap-sm p-sm border border-outline-variant rounded-lg cursor-pointer hover:bg-surface-container-low transition-colors">
+<input class="w-5 h-5 rounded text-primary focus:ring-primary" type="checkbox"/>
+<span class="font-body-md">Economics</span>
+</label>
+</div>
+</div>
+<!-- Upload Area -->
+<div class="flex flex-col gap-sm">
+<label class="font-label-lg text-label-lg text-on-surface-variant px-1">Previous Transcripts &amp; Records *</label>
+<div class="upload-zone rounded-xl p-xl flex flex-col items-center justify-center gap-md cursor-pointer text-center" id="drop-zone">
+<div class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[32px]">upload_file</span>
+</div>
+<div>
+<p class="font-title-md text-title-md text-on-surface">Click to upload or drag and drop</p>
+<p class="font-body-md text-body-md text-on-surface-variant">Support for PDF, JPG, PNG (Max 5MB)</p>
+</div>
+<input class="hidden" id="file-input" type="file"/>
+</div>
+<!-- Upload List Mockup -->
+<div class="hidden" id="file-preview-list">
+<div class="flex items-center justify-between p-md bg-surface-container-low rounded-lg border border-outline-variant">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-primary">description</span>
+<span class="font-body-md text-on-surface">transcript_2023.pdf</span>
+</div>
+<button class="material-symbols-outlined text-error">delete</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-between pt-lg">
+<button class="px-xl h-12 flex items-center gap-sm border border-outline text-primary font-bold rounded-lg hover:bg-surface-container-low transition-all active:scale-95" type="button">
+<span class="material-symbols-outlined">arrow_back</span>
+                            Back
+                        </button>
+<button class="px-xl h-12 flex items-center gap-sm bg-primary text-white font-bold rounded-lg hover:shadow-lg transition-all active:scale-95" onclick="window.location.reload()" type="button">
+                            Next Step
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<footer class="mt-auto py-lg bg-surface-container-low border-t border-outline-variant">
+<div class="max-w-5xl mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-md">
+<p class="font-body-md text-body-md text-on-surface-variant">© 2024 EduSync Administration System. All rights reserved.</p>
+<div class="flex gap-xl">
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary" href="/admin">Support Center</a>
+<a class="font-label-lg text-label-lg text-on-surface-variant hover:text-primary" href="/admin">Privacy Policy</a>
+</div>
+</div>
+</footer>
+<script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewList = document.getElementById('file-preview-list');
+
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('bg-surface-container-high', 'border-primary');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('bg-surface-container-high', 'border-primary');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('bg-surface-container-high', 'border-primary');
+            handleFileUpload();
+        });
+
+        fileInput.addEventListener('change', handleFileUpload);
+
+        function handleFileUpload() {
+            // Mock visualization of file upload
+            previewList.classList.remove('hidden');
+            previewList.classList.add('flex', 'flex-col', 'gap-sm', 'mt-md');
+        }
+    </script>
+</body></html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSync - Parent/Guardian Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "surface": "#f7f9ff",
+                        "inverse-on-surface": "#eef1f7",
+                        "on-error": "#ffffff",
+                        "tertiary-fixed-dim": "#ffba45",
+                        "primary-container": "#1a73e8",
+                        "surface-variant": "#dfe3e8",
+                        "tertiary-container": "#a06d00",
+                        "primary-fixed-dim": "#adc7ff",
+                        "secondary-fixed": "#dbe3f1",
+                        "primary": "#005bbf",
+                        "on-secondary-fixed": "#141c26",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "on-background": "#181c20",
+                        "on-primary-container": "#ffffff",
+                        "secondary-container": "#dbe3f1",
+                        "surface-container-high": "#e5e8ee",
+                        "error": "#ba1a1a",
+                        "tertiary": "#805600",
+                        "outline": "#727785",
+                        "surface-dim": "#d7dae0",
+                        "on-secondary-container": "#5d6571",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f1f4fa",
+                        "on-surface-variant": "#414754",
+                        "on-primary-fixed": "#001a41",
+                        "on-secondary": "#ffffff",
+                        "inverse-primary": "#adc7ff",
+                        "on-tertiary-container": "#0a0400",
+                        "surface-container-highest": "#dfe3e8",
+                        "surface-container": "#ebeef4",
+                        "tertiary-fixed": "#ffddb0",
+                        "surface-tint": "#005bc0",
+                        "on-primary-fixed-variant": "#004493",
+                        "surface-bright": "#f7f9ff",
+                        "background": "#f7f9ff",
+                        "primary-fixed": "#d8e2ff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#575f6b",
+                        "on-tertiary-fixed": "#281800",
+                        "on-secondary-fixed-variant": "#3f4752",
+                        "on-error-container": "#93000a",
+                        "inverse-surface": "#2d3135",
+                        "secondary-fixed-dim": "#bfc7d4",
+                        "outline-variant": "#c1c6d6",
+                        "on-surface": "#181c20"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "margin-mobile": "16px",
+                        "xl": "32px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "base": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "label-lg": ["Roboto"],
+                        "headline-sm-mobile": ["Plus Jakarta Sans"],
+                        "title-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Roboto"],
+                        "title-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Roboto"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                        "headline-sm-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                        "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.15px", "fontWeight": "600"}],
+                        "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                        "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                        "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Roboto', sans-serif; }
+        .plus-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-active .step-circle {
+            background-color: #005bbf;
+            color: #ffffff;
+            box-shadow: 0 0 0 4px #d8e2ff;
+        }
+        .step-complete .step-circle {
+            background-color: #005bbf;
+            color: #ffffff;
+        }
+        .step-pending .step-circle {
+            background-color: #dfe3e8;
+            color: #414754;
+        }
+        .input-focus-ring:focus-within {
+            border-color: #005bbf;
+            box-shadow: 0 0 0 1px #005bbf;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen">
+<!-- TopAppBar Navigation Shell -->
+<header class="bg-surface-container-lowest flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50 border-b border-outline-variant shadow-sm">
+<div class="flex items-center gap-md">
+<span class="text-title-lg font-title-lg font-bold text-primary">EduSync</span>
+</div>
+<nav class="hidden md:flex gap-lg h-full items-center">
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors" href="/admin">Dashboard</a>
+<a class="text-primary font-label-lg text-label-lg border-b-2 border-primary pb-1 transition-colors" href="/admin">Students</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors" href="/admin">Faculty</a>
+<a class="text-on-surface-variant font-label-lg text-label-lg hover:text-primary transition-colors" href="/analytics">Reports</a>
+</nav>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined p-sm text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined p-sm text-on-surface-variant hover:bg-surface-container-high rounded-full transition-all" data-icon="settings">settings</button>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5-VhFfRoQBl96uk4rw4tH7VEBo9OpaJXwWMbGleuw1jrp2l8xYefO4jClBcc712RGAiOfhL4m0W4OB3RUg3M1DRAY7E83DlIZhBs0UU01ui0ua4G7R3lGXOEXLyspzWOY7Rd87MNgxQsdS6XEeE-Fo9pIZW6XUSFYh1oYmzFE7ovHofCgi_hy-ZwVCb1BMGDtKJJIzTbKt4od4sW6YDTU1T83ThljEjTndO47BkICv0GFh-XcrgtBbnC7l7vXiq1kfbIEHX96TbqP"/>
+</div>
+</header>
+<main class="max-w-[1200px] mx-auto px-margin-mobile md:px-margin-desktop py-xl">
+<!-- Progress Stepper -->
+<div class="mb-xl overflow-x-auto pb-4">
+<div class="flex items-center justify-between min-w-[600px] max-w-3xl mx-auto">
+<!-- Step 1 -->
+<div class="flex flex-col items-center gap-xs step-complete relative">
+<div class="step-circle w-10 h-10 rounded-full flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary">Student Info</span>
+<div class="absolute top-5 left-full w-full h-[2px] bg-primary z-[-1] min-w-[100px]"></div>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center gap-xs step-complete relative">
+<div class="step-circle w-10 h-10 rounded-full flex items-center justify-center transition-all">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary">Academic</span>
+<div class="absolute top-5 left-full w-full h-[2px] bg-primary z-[-1] min-w-[100px]"></div>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center gap-xs step-active relative">
+<div class="step-circle w-10 h-10 rounded-full flex items-center justify-center transition-all font-bold">3</div>
+<span class="text-label-lg font-label-lg text-primary font-bold">Guardians</span>
+<div class="absolute top-5 left-full w-full h-[2px] bg-outline-variant z-[-1] min-w-[100px]"></div>
+</div>
+<!-- Step 4 -->
+<div class="flex flex-col items-center gap-xs step-pending">
+<div class="step-circle w-10 h-10 rounded-full flex items-center justify-center transition-all">4</div>
+<span class="text-label-lg font-label-lg text-on-surface-variant">Medical</span>
+</div>
+<!-- Step 5 -->
+<div class="flex flex-col items-center gap-xs step-pending">
+<div class="step-circle w-10 h-10 rounded-full flex items-center justify-center transition-all">5</div>
+<span class="text-label-lg font-label-lg text-on-surface-variant">Review</span>
+</div>
+</div>
+</div>
+<!-- Form Canvas -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Left Column: Instructional Card -->
+<div class="lg:col-span-4 space-y-lg">
+<div class="bg-surface-container-low rounded-xl p-lg border border-outline-variant">
+<h2 class="text-headline-sm font-headline-sm text-primary mb-md">Parental Information</h2>
+<p class="text-body-md font-body-md text-on-surface-variant mb-lg">
+                        Please provide accurate details for at least one primary guardian. This information is critical for emergency notifications and administrative communication.
+                    </p>
+<div class="flex flex-col gap-md">
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+<div>
+<p class="text-title-md font-title-md text-on-surface">Secure Records</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Data is encrypted and accessible only to authorized staff.</p>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<span class="material-symbols-outlined text-tertiary" data-icon="contact_emergency">contact_emergency</span>
+<div>
+<p class="text-title-md font-title-md text-on-surface">Emergency Setup</p>
+<p class="text-body-md font-body-md text-on-surface-variant">Designate phone numbers that are reachable during school hours.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="relative overflow-hidden rounded-xl aspect-video group">
+<img alt="Teacher interacting with parent" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A professional yet warm medium shot of a school counselor talking with a diverse parent in a brightly lit, modern school office. The background is softly blurred showing educational posters and a clean glass wall. The lighting is high-key and welcoming, reflecting a trusted, collaborative environment with blue and soft grey tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBN9XtQZ5mCntBLJW2GvvYrwdFG6jCzHkoNpkHE8Ru-xGc9p5hC7FWR5jAnuFVWIwq1kAT-3O4gePI77yIkIzefYd6YnJMMrB12lx4UT5ALXOBwP0bSqA5x_YfRyTDPl8YnaFT51OVGzUek9STmhUmygFvIK7vaz4Hf1fxqjfd1NfVGNpbjmeonnWF70oAWuedSlXolX_zVD0_CwM6APIx_apajM9ncB06wzHl3g_nKXzQQv1LzEJ1v3gurONK2YVFhShNWItD7ypsE"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/60 to-transparent"></div>
+<div class="absolute bottom-md left-md right-md">
+<p class="text-white text-label-lg font-label-lg italic">"Ensuring every student has a strong support network starting from home."</p>
+</div>
+</div>
+</div>
+<!-- Right Column: Registration Form -->
+<form class="lg:col-span-8 space-y-lg" id="guardianForm">
+<!-- Primary Guardian Section -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm space-y-md">
+<div class="flex items-center justify-between border-b border-outline-variant pb-md">
+<h3 class="text-title-lg font-title-lg text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+                            Primary Guardian
+                        </h3>
+<span class="px-md py-xs bg-primary-container text-white text-label-lg font-label-lg rounded-full">Mandatory</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Full Name -->
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Full Legal Name</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="e.g. Sarah Jenkins" required="" type="text"/>
+</div>
+</div>
+<!-- Relationship -->
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Relationship to Student</label>
+<div class="flex items-center px-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<select class="w-full bg-transparent border-none focus:ring-0 text-on-surface py-md p-0">
+<option>Mother</option>
+<option>Father</option>
+<option>Legal Guardian</option>
+<option>Grandparent</option>
+<option>Other</option>
+</select>
+</div>
+</div>
+<!-- Occupation -->
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Occupation</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="e.g. Software Engineer" type="text"/>
+</div>
+</div>
+<!-- Contact Number -->
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Emergency Contact Number</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<span class="material-symbols-outlined text-outline mr-2 text-[20px]" data-icon="call">call</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="+1 (555) 000-0000" required="" type="tel"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Secondary Guardian Section (Optional) -->
+<div class="bg-surface-container-lowest rounded-xl p-lg border border-outline-variant shadow-sm space-y-md">
+<div class="flex items-center justify-between border-b border-outline-variant pb-md">
+<h3 class="text-title-lg font-title-lg text-on-surface flex items-center gap-sm">
+<span class="material-symbols-outlined text-outline" data-icon="person_outline">person_outline</span>
+                            Secondary Guardian
+                        </h3>
+<span class="px-md py-xs bg-surface-variant text-on-surface-variant text-label-lg font-label-lg rounded-full">Optional</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Full Legal Name</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="e.g. Michael Jenkins" type="text"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Relationship to Student</label>
+<div class="flex items-center px-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<select class="w-full bg-transparent border-none focus:ring-0 text-on-surface py-md p-0">
+<option>Father</option>
+<option>Mother</option>
+<option>Legal Guardian</option>
+<option>Other</option>
+</select>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Occupation</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="e.g. Sales Director" type="text"/>
+</div>
+</div>
+<div class="space-y-xs">
+<label class="text-label-lg font-label-lg text-on-surface-variant ml-1">Emergency Contact Number</label>
+<div class="flex items-center px-md py-md bg-surface-container-low border border-outline-variant rounded-lg transition-all input-focus-ring">
+<span class="material-symbols-outlined text-outline mr-2 text-[20px]" data-icon="call">call</span>
+<input class="w-full bg-transparent border-none focus:ring-0 text-on-surface p-0" placeholder="+1 (555) 000-0000" type="tel"/>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex items-center justify-between pt-lg">
+<button class="flex items-center gap-sm px-xl py-md text-primary font-title-md rounded-lg border border-outline-variant hover:bg-surface-container-high transition-all active:scale-95" type="button">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+                        Back
+                    </button>
+<div class="flex gap-md">
+<button class="hidden md:block px-xl py-md text-on-surface-variant font-title-md hover:text-on-surface transition-colors" type="button">
+                            Save Draft
+                        </button>
+<button class="flex items-center gap-sm px-xl py-md bg-primary text-white font-title-md rounded-lg shadow-md hover:bg-opacity-90 transition-all active:scale-95" type="submit">
+                            Next Step
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</form>
+</div>
+</main>
+<script>
+        // Micro-interaction: Form input focus effects and active button state handling
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('shadow-md');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('shadow-md');
+            });
+        });
+
+        const guardianForm = document.getElementById('guardianForm');
+        guardianForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // In a real app, logic to proceed to Step 4 would be here
+            console.log('Moving to Step 4...');
+            alert('Guardian details saved! Navigating to Medical History (Step 4).');
+        });
+    </script>
+</body></html>

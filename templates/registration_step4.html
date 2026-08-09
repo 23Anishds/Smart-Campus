@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>EduSync | Student Registration Review</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Roboto:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "surface": "#f7f9ff",
+                    "inverse-on-surface": "#eef1f7",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#ffba45",
+                    "primary-container": "#1a73e8",
+                    "surface-variant": "#dfe3e8",
+                    "tertiary-container": "#a06d00",
+                    "primary-fixed-dim": "#adc7ff",
+                    "secondary-fixed": "#dbe3f1",
+                    "primary": "#005bbf",
+                    "on-secondary-fixed": "#141c26",
+                    "on-tertiary-fixed-variant": "#614000",
+                    "on-background": "#181c20",
+                    "on-primary-container": "#ffffff",
+                    "secondary-container": "#dbe3f1",
+                    "surface-container-high": "#e5e8ee",
+                    "error": "#ba1a1a",
+                    "tertiary": "#805600",
+                    "outline": "#727785",
+                    "surface-dim": "#d7dae0",
+                    "on-secondary-container": "#5d6571",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container-low": "#f1f4fa",
+                    "on-surface-variant": "#414754",
+                    "on-primary-fixed": "#001a41",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#adc7ff",
+                    "on-tertiary-container": "#0a0400",
+                    "surface-container-highest": "#dfe3e8",
+                    "surface-container": "#ebeef4",
+                    "tertiary-fixed": "#ffddb0",
+                    "surface-tint": "#005bc0",
+                    "on-primary-fixed-variant": "#004493",
+                    "surface-bright": "#f7f9ff",
+                    "background": "#f7f9ff",
+                    "primary-fixed": "#d8e2ff",
+                    "error-container": "#ffdad6",
+                    "secondary": "#575f6b",
+                    "on-tertiary-fixed": "#281800",
+                    "on-secondary-fixed-variant": "#3f4752",
+                    "on-error-container": "#93000a",
+                    "inverse-surface": "#2d3135",
+                    "secondary-fixed-dim": "#bfc7d4",
+                    "outline-variant": "#c1c6d6",
+                    "on-surface": "#181c20"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-desktop": "32px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "margin-mobile": "16px",
+                    "xl": "32px",
+                    "lg": "24px",
+                    "gutter": "24px",
+                    "base": "4px",
+                    "md": "16px"
+            },
+            "fontFamily": {
+                    "label-lg": ["Roboto"],
+                    "headline-sm-mobile": ["Plus Jakarta Sans"],
+                    "title-lg": ["Plus Jakarta Sans"],
+                    "body-lg": ["Roboto"],
+                    "title-md": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "body-md": ["Roboto"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-lg": ["12px", {"lineHeight": "16px", "letterSpacing": "0.5px", "fontWeight": "500"}],
+                    "headline-sm-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "title-lg": ["22px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "letterSpacing": "0.5px", "fontWeight": "400"}],
+                    "title-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0.15px", "fontWeight": "600"}],
+                    "headline-md": ["28px", {"lineHeight": "36px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.25px", "fontWeight": "400"}],
+                    "display-lg": ["57px", {"lineHeight": "64px", "letterSpacing": "-0.25px", "fontWeight": "700"}],
+                    "headline-sm": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .step-active { font-variation-settings: 'FILL' 1; }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(224, 224, 224, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-surface-container-lowest dark:bg-surface-dim flex justify-between items-center w-full px-margin-desktop h-16 sticky top-0 z-50 border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none">
+<div class="flex items-center gap-md">
+<span class="text-title-lg font-title-lg font-bold text-primary dark:text-primary-fixed-dim">EduSync</span>
+<nav class="hidden md:flex items-center gap-xl ml-xl">
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-lg text-label-lg" href="/admin">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed-dim border-b-2 border-primary dark:border-primary-fixed-dim pb-1 font-label-lg text-label-lg" href="/admin">Students</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-lg text-label-lg" href="/admin">Faculty</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed-dim transition-colors font-label-lg text-label-lg" href="/analytics">Reports</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-sm rounded-full transition-all">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:bg-surface-container-high p-sm rounded-full transition-all">settings</button>
+<img alt="Administrator Profile" class="w-8 h-8 rounded-full bg-primary-container object-cover border border-outline-variant" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU-PyCuV1vdP1QYONKCnt1eH9z5h1zq4LcGfJQG4fBxlFMDkurbQVyC-EgYlOA4WdILEpY2aBliWP8spobbaztWOgheneL9jYnLD9ofuM-fXQIMPesRfOtXLxR0x6mUsY_C8GsJteJ-1CQk9I-0z6d5Bj0wNgZi6hU_AzEJ50gCL4z-q4kihouacobH8UPwpR1kI2HddWI9pZMC9O2kXwp4H-V17d_BhVCTxNLQTXBECrXFoVidICN4AMTrKm72VNP_gabvw3GmEtd"/>
+</div>
+</header>
+<div class="flex">
+<!-- SideNavBar (Suppressed for focused registration flow as per UX mandates, using minimal shell) -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-64px)] py-lg px-md gap-sm bg-surface-container-low dark:bg-surface-container-lowest w-[280px] sticky top-16">
+<div class="flex items-center gap-md px-md mb-lg">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container">school</span>
+</div>
+<div>
+<h2 class="text-title-md font-title-md font-bold text-primary">EduSync Admin</h2>
+<p class="text-body-md font-body-md text-on-surface-variant">Central High School</p>
+</div>
+</div>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="/admin">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label-lg text-label-lg">Overview</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm bg-primary-container text-on-primary-container rounded-lg font-bold transition-transform translate-x-1" href="/admin">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
+<span class="font-label-lg text-label-lg">Registration</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-all" href="/admin">
+<span class="material-symbols-outlined">school</span>
+<span class="font-label-lg text-label-lg">Enrollment</span>
+</a>
+<div class="mt-auto pt-lg border-t border-outline-variant">
+<button class="w-full py-md bg-secondary-container text-on-secondary-container rounded-xl font-bold flex items-center justify-center gap-sm hover:brightness-95 transition-all">
+<span class="material-symbols-outlined">support_agent</span>
+                    Support Center
+                </button>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 px-margin-mobile md:px-margin-desktop py-lg max-w-6xl mx-auto">
+<!-- Stepper Component -->
+<div class="mb-xl">
+<div class="flex items-center justify-between max-w-3xl mx-auto relative">
+<!-- Progress Line Background -->
+<div class="absolute top-5 left-0 w-full h-[2px] bg-surface-variant -z-10"></div>
+<!-- Active Progress Line -->
+<div class="absolute top-5 left-0 w-full h-[2px] bg-primary -z-10"></div>
+<!-- Step 1 -->
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary">Personal</span>
+</div>
+<!-- Step 2 -->
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary">Academic</span>
+</div>
+<!-- Step 3 -->
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary">Guardian</span>
+</div>
+<!-- Step 4 (Active) -->
+<div class="flex flex-col items-center gap-xs">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container border-4 border-surface flex items-center justify-center shadow-lg ring-2 ring-primary">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+<span class="text-label-lg font-label-lg text-primary font-bold">Review</span>
+</div>
+</div>
+</div>
+<div class="mb-lg">
+<h1 class="text-headline-md font-headline-md text-on-surface">Review Registration</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Please verify the information below before final submission. All fields marked as required must be accurate.</p>
+</div>
+<!-- Review Bento Grid -->
+<div class="bento-grid">
+<!-- Personal Information Card -->
+<section class="col-span-12 lg:col-span-8 glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all border-l-4 border-l-primary relative">
+<div class="flex justify-between items-start mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="text-title-md font-title-md text-on-surface">Personal Information</h3>
+</div>
+<button class="flex items-center gap-xs text-primary font-label-lg text-label-lg hover:bg-primary-fixed px-sm py-xs rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                            Edit
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Full Name</span>
+<span class="text-body-md font-body-md font-bold">Benjamin Arthur Harrison</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Date of Birth</span>
+<span class="text-body-md font-body-md font-bold">May 14, 2009</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Gender</span>
+<span class="text-body-md font-body-md font-bold">Male</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Primary Email</span>
+<span class="text-body-md font-body-md font-bold">b.harrison@student.edu</span>
+</div>
+<div class="flex flex-col gap-xs col-span-1 md:col-span-2">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Residential Address</span>
+<span class="text-body-md font-body-md font-bold">482 Willow Creek Way, Apartment 4B, Springfield, IL 62704</span>
+</div>
+</div>
+</section>
+<!-- Profile Photo Preview -->
+<section class="col-span-12 lg:col-span-4 glass-card rounded-xl p-lg shadow-sm flex flex-col items-center justify-center gap-md">
+<div class="relative">
+<img alt="Student Profile Photo" class="w-32 h-32 rounded-full object-cover border-4 border-surface-variant shadow-sm" data-alt="A clean, professional studio headshot of a teenage boy with a friendly, confident expression. The lighting is soft and high-key, suitable for a school identification card. He is wearing a dark navy blue polo shirt against a neutral, light gray background, maintaining a corporate yet approachable educational aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBz7hqIfJujpaxZGjjSr43WWW8Z7yW273vq33WKLgffQHgY9dXCfTIGMioUU6hZ_jnIMpjDK3vWcWbdoC4mYTr8d-vhAqTYQqaIyvzy2y7jo4oh-XprlgdJ3jwqUKsO4V5eM9jqmCDseSS_x6KGvFO8ptPORIXSq_YmebcEhewEAIp77-NO2JHKRQSfk4wz5HOi-ndl0vNNO-ItPJE-JSf70O8LlIWKOYkp9Zf5-stSHalh8NbTjDif6RXRu0tqYtbvwrLjCknWZPhr"/>
+<div class="absolute bottom-0 right-0 bg-primary text-on-primary p-xs rounded-full border-2 border-white">
+<span class="material-symbols-outlined text-[16px]">verified_user</span>
+</div>
+</div>
+<div class="text-center">
+<p class="text-label-lg font-label-lg text-on-surface-variant mb-xs">Official Identification ID</p>
+<p class="text-title-md font-title-md font-bold text-primary tracking-widest uppercase">STU-2024-8910</p>
+</div>
+</section>
+<!-- Academic Records Card -->
+<section class="col-span-12 lg:col-span-6 glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all border-l-4 border-l-tertiary">
+<div class="flex justify-between items-start mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-tertiary">history_edu</span>
+<h3 class="text-title-md font-title-md text-on-surface">Academic History</h3>
+</div>
+<button class="flex items-center gap-xs text-primary font-label-lg text-label-lg hover:bg-primary-fixed px-sm py-xs rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                            Edit
+                        </button>
+</div>
+<div class="space-y-md">
+<div class="flex justify-between items-center p-sm bg-surface-container-low rounded-lg">
+<div class="flex flex-col">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Grade Level</span>
+<span class="text-body-md font-body-md font-bold">10th Grade (Sophomore)</span>
+</div>
+<span class="px-sm py-xs bg-tertiary-fixed text-on-tertiary-fixed rounded-full text-label-lg font-bold">Standard Track</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Previous Institution</span>
+<span class="text-body-md font-body-md font-bold">Maplewood Junior Academy</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">GPA (Weighted)</span>
+<span class="text-title-md font-title-md text-primary font-bold">3.85 / 4.0</span>
+</div>
+</div>
+</section>
+<!-- Guardian Information Card -->
+<section class="col-span-12 lg:col-span-6 glass-card rounded-xl p-lg shadow-sm hover:shadow-md transition-all border-l-4 border-l-secondary">
+<div class="flex justify-between items-start mb-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">family_restroom</span>
+<h3 class="text-title-md font-title-md text-on-surface">Guardian Contact</h3>
+</div>
+<button class="flex items-center gap-xs text-primary font-label-lg text-label-lg hover:bg-primary-fixed px-sm py-xs rounded-lg transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                            Edit
+                        </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Primary Guardian</span>
+<span class="text-body-md font-body-md font-bold">Eleanor Harrison</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Relationship</span>
+<span class="text-body-md font-body-md font-bold">Mother</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Contact Phone</span>
+<span class="text-body-md font-body-md font-bold">+1 (555) 012-3456</span>
+</div>
+<div class="flex flex-col gap-xs">
+<span class="text-label-lg font-label-lg text-on-surface-variant">Emergency Priority</span>
+<span class="flex items-center gap-xs text-error font-bold">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">priority_high</span>
+                                High (First Contact)
+                            </span>
+</div>
+</div>
+</section>
+<!-- Terms & Submission Section -->
+<section class="col-span-12 mt-lg">
+<div class="bg-surface-container rounded-xl p-lg border border-outline-variant">
+<label class="flex items-start gap-md cursor-pointer group">
+<div class="mt-1 relative flex items-center">
+<input class="peer h-5 w-5 rounded border-outline text-primary focus:ring-primary transition-all cursor-pointer" id="terms_check" type="checkbox"/>
+<div class="absolute inset-0 bg-primary opacity-0 peer-checked:group-hover:opacity-10 rounded transition-opacity"></div>
+</div>
+<div class="flex-1">
+<span class="text-title-md font-title-md text-on-surface block">Acknowledgement &amp; Consent</span>
+<p class="text-body-md font-body-md text-on-surface-variant mt-xs">
+                                    I hereby certify that all information provided in this registration form is true and complete to the best of my knowledge. I understand that any false statement or omission may disqualify the student's enrollment. I have read and agree to the 
+                                    <a class="text-primary underline decoration-primary/30 hover:decoration-primary" href="/admin">EduSync School Board Privacy Policy</a> 
+                                    and Student Code of Conduct.
+                                </p>
+</div>
+</label>
+<div class="flex flex-col md:flex-row justify-end items-center gap-md mt-xl">
+<button class="w-full md:w-auto px-xl py-md border border-outline text-primary rounded-lg font-bold hover:bg-surface-container-high transition-all active:scale-95">
+                                Save Draft
+                            </button>
+<button class="w-full md:w-auto px-xl py-md bg-primary text-on-primary rounded-lg font-bold shadow-lg hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-sm active:scale-95" disabled="" id="submit_btn">
+                                Submit Registration
+                                <span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+<!-- Floating Toast Placeholder (Success State) -->
+<div class="fixed bottom-lg right-lg transform translate-y-20 opacity-0 transition-all duration-500 z-50" id="success_toast">
+<div class="bg-inverse-surface text-inverse-on-surface px-lg py-md rounded-xl shadow-2xl flex items-center gap-md border-l-4 border-primary">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<div>
+<p class="font-bold">Registration Submitted</p>
+<p class="text-label-lg">Reference ID: ED-CONF-00192</p>
+</div>
+</div>
+</div>
+<script>
+        const termsCheck = document.getElementById('terms_check');
+        const submitBtn = document.getElementById('submit_btn');
+        const successToast = document.getElementById('success_toast');
+
+        termsCheck.addEventListener('change', (e) => {
+            submitBtn.disabled = !e.target.checked;
+        });
+
+        submitBtn.addEventListener('click', () => {
+            if (!submitBtn.disabled) {
+                submitBtn.innerHTML = `
+                    <span class="material-symbols-outlined animate-spin">sync</span>
+                    Processing...
+                `;
+                submitBtn.disabled = true;
+                
+                // Simulate network latency
+                setTimeout(() => {
+                    submitBtn.innerHTML = `
+                        Registration Complete
+                        <span class="material-symbols-outlined">verified</span>
+                    `;
+                    submitBtn.classList.replace('bg-primary', 'bg-tertiary-container');
+                    
+                    // Show success toast
+                    successToast.classList.remove('translate-y-20', 'opacity-0');
+                    successToast.classList.add('translate-y-0', 'opacity-100');
+                    
+                    // Ripple effect for visual feedback
+                    const ripple = document.createElement('div');
+                    ripple.className = 'absolute inset-0 bg-white/20 rounded-lg animate-ping';
+                    submitBtn.appendChild(ripple);
+                }, 1500);
+            }
+        });
+
+        // Hover lift logic for cards
+        document.querySelectorAll('.glass-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSync | Teacher Command Center</title>
+    <meta name="description" content="AI-powered teacher dashboard with live session management, actionable heatmap analysis, and real-time student radar.">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#0d9488',
+                        dark: '#0f172a',
+                        ai: '#7c3aed'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f1f5f9; font-family: 'Outfit', sans-serif; }
+        .glass { background: rgba(255,255,255,0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.7); }
+
+        /* Scrollbar */
+        .scroller::-webkit-scrollbar { width: 5px; }
+        .scroller::-webkit-scrollbar-track { background: transparent; }
+        .scroller::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+        /* Section fade */
+        .t-sec { display: none; }
+        .t-sec.active { display: block; animation: fadeIn .35s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Sidebar */
+        .sidebar-active { background: rgba(255,255,255,0.15) !important; color: white !important; }
+
+        /* AI Badge pulse */
+        @keyframes aiPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4); }
+            50% { box-shadow: 0 0 0 8px rgba(124, 58, 237, 0); }
+        }
+        .ai-badge { animation: aiPulse 2s infinite; }
+
+        /* Live badge */
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .live-dot { animation: livePulse 1.2s infinite; }
+
+        /* Radar item */
+        .radar-critical { background: linear-gradient(135deg, #fef2f2, #fff); border-left: 4px solid #ef4444; }
+        .radar-warning { background: linear-gradient(135deg, #fffbeb, #fff); border-left: 4px solid #f59e0b; }
+        .radar-info { background: linear-gradient(135deg, #eff6ff, #fff); border-left: 4px solid #3b82f6; }
+
+        /* AI Spinner */
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .ai-spin { animation: spin 1s linear infinite; }
+
+        /* Chat bubbles */
+        .chat-teacher { background: linear-gradient(135deg, #2563eb, #1d4ed8); color: white; border-radius: 18px 18px 4px 18px; }
+        .chat-student { background: white; color: #1e293b; border: 1px solid #e2e8f0; border-radius: 18px 18px 18px 4px; }
+        .chat-ai { background: linear-gradient(135deg, #7c3aed, #6d28d9); color: white; border-radius: 18px 18px 4px 18px; }
+        .chat-system { background: #f1f5f9; color: #64748b; border-radius: 8px; text-align: center; font-size: 0.75rem; }
+
+        /* Heatmap cell */
+        .hm-cell { transition: transform 0.15s, box-shadow 0.15s; cursor: pointer; border-radius: 4px; }
+        .hm-cell:hover { transform: scale(1.2); box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 10; position: relative; }
+
+        /* Session status */
+        .session-active { background: linear-gradient(135deg, #dcfce7, #f0fdf4); border: 2px solid #22c55e; }
+        .session-ended { background: linear-gradient(135deg, #f1f5f9, #fff); border: 2px solid #cbd5e1; }
+
+        /* Participant online */
+        .p-online { border-left: 3px solid #22c55e; }
+        .p-away { border-left: 3px solid #f59e0b; }
+        .p-offline { border-left: 3px solid #94a3b8; }
+
+        /* Trend badge */
+        .trend-declining { color: #ef4444; }
+        .trend-improving { color: #22c55e; }
+        .trend-stable { color: #3b82f6; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- ═══════════ SIDEBAR ═══════════ -->
+    <aside class="w-20 bg-dark text-white flex flex-col items-center py-6 border-r border-gray-800 z-20 shadow-xl shrink-0">
+        <div class="mb-10">
+            <span class="material-icons-outlined text-3xl text-primary">school</span>
+        </div>
+        <nav class="flex-1 flex flex-col gap-4 w-full px-2">
+            <button onclick="tGoTo('command')" id="tnb-command" title="Command Center"
+                class="sidebar-btn sidebar-active w-full py-3 rounded-xl text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">dashboard</span>
+                <span class="text-[9px] font-semibold">Home</span>
+            </button>
+            <button onclick="tGoTo('session')" id="tnb-session" title="Live Session"
+                class="sidebar-btn w-full py-3 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">video_camera_front</span>
+                <span class="text-[9px] font-semibold">Session</span>
+            </button>
+            <button onclick="tGoTo('roster')" id="tnb-roster" title="Class Roster"
+                class="sidebar-btn w-full py-3 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">group</span>
+                <span class="text-[9px] font-semibold">Roster</span>
+            </button>
+            <button onclick="tGoTo('gradebook')" id="tnb-gradebook" title="Gradebook"
+                class="sidebar-btn w-full py-3 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">spellcheck</span>
+                <span class="text-[9px] font-semibold">Grades</span>
+            </button>
+            <button onclick="tGoTo('planner')" id="tnb-planner" title="Lesson Planner"
+                class="sidebar-btn w-full py-3 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">menu_book</span>
+                <span class="text-[9px] font-semibold">Planner</span>
+            </button>
+            <button onclick="tGoTo('comms')" id="tnb-comms" title="Communication"
+                class="sidebar-btn w-full py-3 hover:bg-white/5 rounded-xl text-gray-400 hover:text-white transition flex flex-col items-center gap-0.5">
+                <span class="material-icons-outlined text-[22px]">forum</span>
+                <span class="text-[9px] font-semibold">Comms</span>
+            </button>
+        </nav>
+        <div class="mt-auto flex flex-col gap-4 items-center">
+            <button onclick="tGoTo('settings')" id="tnb-settings" class="sidebar-btn text-gray-400 hover:text-white transition" title="Settings">
+                <span class="material-icons-outlined">settings</span>
+            </button>
+            <a href="/logout" class="text-red-400 hover:text-red-300" title="Logout">
+                <span class="material-icons-outlined">logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- ═══════════ MAIN ═══════════ -->
+    <main class="flex-1 flex flex-col h-full overflow-hidden">
+
+        <!-- Topbar -->
+        <header class="h-16 bg-white border-b border-gray-200 px-8 flex justify-between items-center shrink-0 shadow-sm z-10">
+            <div>
+                <h1 class="font-bold text-xl text-gray-800" id="t-page-title">Teacher Command Center</h1>
+                <p class="text-xs text-gray-500 font-medium" id="t-page-sub">Good Morning, Dr. Jenkins</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <!-- Live Session Indicator -->
+                <div id="live-session-indicator" class="hidden items-center gap-2 bg-green-50 border border-green-200 px-3 py-1.5 rounded-full">
+                    <span class="w-2 h-2 bg-green-500 rounded-full live-dot"></span>
+                    <span class="text-xs font-bold text-green-700" id="live-session-label">Session Live</span>
+                </div>
+                <button onclick="alertPrincipal()" class="bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-red-100 transition">
+                    <span class="material-icons-outlined text-[16px]">campaign</span> SOS
+                </button>
+                <button class="bg-secondary text-white px-3 py-1.5 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-teal-700 transition" onclick="toggleSubModal()">
+                    <span class="material-icons-outlined text-[16px]">transfer_within_a_station</span> Request Sub
+                </button>
+            </div>
+        </header>
+
+        <!-- Content Area -->
+        <div class="flex-1 overflow-y-auto p-6 scroller bg-gray-50/50">
+
+            <!-- ████████ COMMAND CENTER ████████ -->
+            <section id="tsec-command" class="t-sec active space-y-6">
+
+                <!-- Row 1: Stats + Schedule -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <button onclick="tGoTo('roster')" class="glass p-4 rounded-2xl flex flex-col items-start hover:shadow-md hover:border-primary transition group text-left">
+                            <span class="material-icons-outlined text-primary mb-2 bg-blue-50 p-2 rounded-lg group-hover:scale-110 transition">engineering</span>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase">Total Students</h4>
+                            <p class="text-2xl font-bold text-gray-800" id="stat-students">-</p>
+                            <span class="text-xs text-blue-600 font-semibold mt-1">View Roster ➔</span>
+                        </button>
+                        <button onclick="tGoTo('roster')" class="glass p-4 rounded-2xl flex flex-col items-start hover:shadow-md hover:border-secondary transition group text-left">
+                            <span class="material-icons-outlined text-secondary mb-2 bg-teal-50 p-2 rounded-lg group-hover:scale-110 transition">fact_check</span>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase">Avg Attendance</h4>
+                            <p class="text-2xl font-bold text-gray-800" id="stat-attendance">-</p>
+                            <span class="text-xs text-teal-600 font-semibold mt-1">View Roster ➔</span>
+                        </button>
+                        <button onclick="tGoTo('gradebook')" class="glass p-4 rounded-2xl flex flex-col items-start hover:shadow-md hover:border-yellow-500 transition group text-left">
+                            <span class="material-icons-outlined text-yellow-500 mb-2 bg-yellow-50 p-2 rounded-lg group-hover:scale-110 transition">assessment</span>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase">Avg GPA</h4>
+                            <p class="text-2xl font-bold text-gray-800" id="stat-gpa">-</p>
+                            <span class="text-xs text-yellow-600 font-semibold mt-1">View Gradebook ➔</span>
+                        </button>
+                        <button onclick="scrollTo({top:0,behavior:'smooth'})" class="glass p-4 rounded-2xl flex flex-col items-start hover:shadow-md hover:border-red-500 transition group text-left">
+                            <span class="material-icons-outlined text-red-500 mb-2 bg-red-50 p-2 rounded-lg group-hover:scale-110 transition">warning</span>
+                            <h4 class="text-xs font-bold text-gray-400 uppercase">Critical Flags</h4>
+                            <p class="text-2xl font-bold text-red-600" id="stat-flags">-</p>
+                            <span class="text-xs text-red-600 font-semibold mt-1">Review Alerts ➔</span>
+                        </button>
+                    </div>
+                    <!-- Schedule -->
+                    <div class="glass p-5 rounded-2xl flex flex-col">
+                        <h3 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span class="material-icons-outlined text-gray-500">schedule</span> Today's Schedule
+                        </h3>
+                        <div id="schedule-container" class="space-y-3 flex-1"></div>
+                    </div>
+                </div>
+
+                <!-- Row 2: AI Live Action Radar + Quick Grading -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                    <!-- AI Live Action Radar -->
+                    <div class="glass p-6 rounded-2xl">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                <span class="material-icons-outlined text-orange-500">flash_on</span>
+                                Live Action Radar
+                                <span class="bg-purple-100 text-purple-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ai-badge">
+                                    ✦ AI
+                                </span>
+                            </h3>
+                            <button onclick="refreshRadar()" id="radar-refresh-btn"
+                                class="flex items-center gap-1.5 text-xs font-bold text-purple-600 bg-purple-50 hover:bg-purple-100 border border-purple-200 px-3 py-1.5 rounded-lg transition">
+                                <span class="material-icons-outlined text-[14px]" id="radar-refresh-icon">auto_awesome</span>
+                                Refresh with AI
+                            </button>
+                        </div>
+                        <div id="activity-container" class="space-y-3 scroller overflow-y-auto max-h-[300px] pr-1">
+                            <div class="flex items-center gap-3 p-4 rounded-xl bg-purple-50 border border-purple-100">
+                                <span class="material-icons-outlined text-purple-400 ai-spin text-[20px]">auto_awesome</span>
+                                <p class="text-sm text-purple-600 font-medium">AI is analyzing student data...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Grading -->
+                    <div class="glass p-6 rounded-2xl border-l-4 border-l-primary">
+                        <div class="flex justify-between items-center mb-5">
+                            <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                                <span class="material-icons-outlined text-primary">rule</span> Quick Grade Entry
+                            </h3>
+                            <button onclick="tGoTo('gradebook')" class="text-sm font-semibold text-primary hover:underline">Full Gradebook</button>
+                        </div>
+                        <div class="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-100/50 text-gray-500 uppercase text-xs">
+                                    <tr>
+                                        <th class="p-3 font-semibold">Student</th>
+                                        <th class="p-3 font-semibold">Assignment</th>
+                                        <th class="p-3 font-semibold text-right">Rapid Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="grading-container" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Row 3: Actionable Heatmap -->
+                <div class="glass p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-5">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <span class="material-icons-outlined text-green-600">grid_on</span>
+                            Actionable Heatmap
+                            <span class="bg-purple-100 text-purple-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider ai-badge">
+                                ✦ AI Insights
+                            </span>
+                        </h3>
+                        <div class="flex gap-2">
+                            <button onclick="alertLowAttendance()" class="bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50 flex items-center gap-1">
+                                <span class="material-icons-outlined text-[16px]">mail</span> Alert Low
+                            </button>
+                            <button onclick="window.location.href='/api/dashboard/export-attendance'" class="bg-primary text-white border border-primary px-3 py-1.5 rounded-lg text-sm font-medium shadow hover:bg-blue-700 flex items-center gap-1">
+                                <span class="material-icons-outlined text-[16px]">download</span> Export
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Heatmap Grid -->
+                    <div class="w-full overflow-x-auto bg-white border border-gray-100 rounded-xl p-4 mb-4">
+                        <div class="text-xs text-gray-400 font-semibold mb-2 flex gap-1">
+                            <div class="w-12 shrink-0">Day</div>
+                            <div class="flex-1">← Weeks (oldest to newest) →</div>
+                        </div>
+                        <div class="flex gap-2">
+                            <div class="flex flex-col gap-1 justify-around text-xs text-gray-400 font-semibold w-12 shrink-0 pt-1">
+                                <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span>
+                            </div>
+                            <div class="flex gap-1 flex-1" id="heatmap-container"></div>
+                        </div>
+                        <!-- Legend -->
+                        <div class="flex items-center gap-3 mt-3 pt-3 border-t border-gray-100">
+                            <span class="text-xs text-gray-400 font-medium">Attendance:</span>
+                            <div class="flex items-center gap-1">
+                                <div class="w-4 h-4 rounded bg-green-500 opacity-20"></div>
+                                <span class="text-xs text-gray-400">Low</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-4 h-4 rounded bg-green-500 opacity-60"></div>
+                                <span class="text-xs text-gray-400">Medium</span>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-4 h-4 rounded bg-green-500 opacity-100"></div>
+                                <span class="text-xs text-gray-400">High</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Heatmap Insight Panel -->
+                    <div id="heatmap-ai-panel" class="hidden">
+                        <div class="rounded-2xl border border-purple-200 overflow-hidden">
+                            <!-- Header -->
+                            <div class="bg-gradient-to-r from-violet-600 to-purple-700 p-4 flex justify-between items-center">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                                        <span class="material-icons-outlined text-white text-[18px]">auto_awesome</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">AI Heatmap Analysis</h4>
+                                        <p class="text-purple-200 text-[10px]">Powered by Mistral</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="heatmap-trend-badge" class="text-xs font-bold bg-white/20 text-white px-2 py-0.5 rounded-full"></span>
+                                    <button onclick="loadHeatmapAI()" class="text-white/70 hover:text-white transition" title="Regenerate">
+                                        <span class="material-icons-outlined text-[18px]">refresh</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Body -->
+                            <div class="bg-white p-5 space-y-4">
+                                <p id="heatmap-ai-summary" class="text-sm text-gray-700 leading-relaxed border-l-4 border-purple-300 pl-3 py-1 italic"></p>
+                                <div>
+                                    <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">🎯 Targeted Interventions</h5>
+                                    <div id="heatmap-interventions" class="space-y-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Trigger Button -->
+                    <div id="heatmap-ai-trigger" class="mt-4">
+                        <button onclick="loadHeatmapAI()" id="heatmap-ai-btn"
+                            class="w-full py-3 rounded-xl border-2 border-dashed border-purple-300 text-purple-600 font-bold text-sm hover:bg-purple-50 hover:border-purple-400 transition flex items-center justify-center gap-2">
+                            <span class="material-icons-outlined text-[18px]">auto_awesome</span>
+                            Analyze with AI — Get Personalized Insights
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- ████████ LIVE SESSION ████████ -->
+            <section id="tsec-session" class="t-sec space-y-6">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-bold text-xl text-gray-800 flex items-center gap-2">
+                        <span class="material-icons-outlined text-primary">video_camera_front</span>
+                        Live Online Session
+                    </h3>
+                    <div id="session-status-badge" class="hidden items-center gap-2 bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-bold text-sm border border-green-300">
+                        <span class="w-2 h-2 bg-green-500 rounded-full live-dot"></span>
+                        <span id="session-status-text">Session Active</span>
+                    </div>
+                </div>
+
+                <!-- Session Start / Info -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                    <!-- Create / Control Panel -->
+                    <div class="lg:col-span-1 space-y-4">
+
+                        <!-- Session Creation -->
+                        <div id="session-create-card" class="glass p-5 rounded-2xl">
+                            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <span class="material-icons-outlined text-primary">rocket_launch</span>
+                                Start a Session
+                            </h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase">Session Title</label>
+                                    <input id="sess-title" type="text" placeholder="e.g. Calculus Live Class"
+                                        class="w-full mt-1 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary">
+                                </div>
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-500 uppercase">Subject</label>
+                                    <select id="sess-subject" class="w-full mt-1 border border-gray-200 rounded-xl p-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30">
+                                        <option>Calculus 101</option>
+                                        <option>Algebra Basics</option>
+                                        <option>Advanced Math</option>
+                                        <option>Physics</option>
+                                        <option>General</option>
+                                    </select>
+                                </div>
+                                <button onclick="startSession()" id="start-session-btn"
+                                    class="w-full py-3 bg-gradient-to-r from-primary to-blue-700 text-white font-bold rounded-xl shadow-lg hover:shadow-primary/40 hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                                    <span class="material-icons-outlined">play_circle</span> Start Session
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Active Session Controls (hidden until session starts) -->
+                        <div id="session-control-card" class="hidden glass p-5 rounded-2xl session-active">
+                            <div class="flex items-center justify-between mb-3">
+                                <h4 class="font-bold text-gray-800 text-sm">Session Active</h4>
+                                <span class="flex items-center gap-1.5 bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full live-dot"></span> LIVE
+                                </span>
+                            </div>
+                            <div class="space-y-2 mb-4">
+                                <p class="text-xs text-gray-500">Session: <strong id="active-sess-title" class="text-gray-800">-</strong></p>
+                                <p class="text-xs text-gray-500">Subject: <strong id="active-sess-subject" class="text-gray-800">-</strong></p>
+                                <p class="text-xs text-gray-500">Started: <strong id="active-sess-time" class="text-gray-800">-</strong></p>
+                                <p class="text-xs text-gray-500">Online Now: <strong id="active-sess-count" class="text-green-600">-</strong></p>
+                            </div>
+                            <button onclick="endSession()" id="end-session-btn"
+                                class="w-full py-2.5 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition flex items-center justify-center gap-2 text-sm">
+                                <span class="material-icons-outlined text-[16px]">stop_circle</span> End Session
+                            </button>
+                        </div>
+
+                        <!-- Participants -->
+                        <div class="glass p-5 rounded-2xl">
+                            <div class="flex justify-between items-center mb-3">
+                                <h4 class="font-bold text-gray-800 text-sm flex items-center gap-1.5">
+                                    <span class="material-icons-outlined text-[18px] text-secondary">group</span> Participants
+                                </h4>
+                                <span id="online-count" class="text-xs bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full">0 online</span>
+                            </div>
+                            <div id="participants-list" class="space-y-1.5 scroller overflow-y-auto max-h-[200px] pr-1">
+                                <p class="text-xs text-gray-400 text-center py-4">Start a session to see participants</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chat + AI Assistant -->
+                    <div class="lg:col-span-2 space-y-4">
+
+                        <!-- Chat Board -->
+                        <div class="glass rounded-2xl overflow-hidden flex flex-col" style="height: 380px;">
+                            <div class="px-5 py-4 bg-gradient-to-r from-slate-800 to-slate-700 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 bg-primary/80 rounded-lg flex items-center justify-center">
+                                        <span class="material-icons-outlined text-white text-[18px]">chat</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-white text-sm">Live Q&A / Chat Board</h4>
+                                        <p class="text-slate-400 text-[10px]">Students can ask questions in real-time</p>
+                                    </div>
+                                </div>
+                                <button onclick="simulateStudentMessage()" title="Simulate student message (demo)"
+                                    class="text-slate-400 hover:text-white transition text-xs bg-white/5 px-2 py-1 rounded-lg">
+                                    + Sim Student
+                                </button>
+                            </div>
+                            <div id="chat-messages" class="flex-1 overflow-y-auto scroller p-4 space-y-3 bg-slate-50/50">
+                                <div class="chat-system p-2 text-center">
+                                    <p class="text-slate-400 text-xs">Start a session to begin the chat</p>
+                                </div>
+                            </div>
+                            <!-- Message Input -->
+                            <div class="p-3 bg-white border-t border-gray-100">
+                                <div class="flex gap-2">
+                                    <input id="chat-input" type="text" placeholder="Type an announcement or question..."
+                                        class="flex-1 border border-gray-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                                        onkeydown="if(event.key==='Enter') sendChatMessage()">
+                                    <button onclick="sendChatMessage()"
+                                        class="bg-primary text-white px-4 py-2 rounded-xl font-bold text-sm hover:bg-blue-700 transition flex items-center gap-1">
+                                        <span class="material-icons-outlined text-[16px]">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Session Assistant -->
+                        <div class="glass p-5 rounded-2xl border border-purple-100">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="font-bold text-gray-800 flex items-center gap-2">
+                                    <span class="material-icons-outlined text-ai">smart_toy</span>
+                                    AI Session Assistant
+                                    <span class="bg-purple-100 text-purple-700 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Mistral</span>
+                                </h4>
+                                <div class="flex gap-1">
+                                    <button onclick="setAIMode('explain')" id="mode-explain"
+                                        class="ai-mode-btn text-xs font-bold px-2.5 py-1 rounded-lg bg-purple-600 text-white transition">Explain</button>
+                                    <button onclick="setAIMode('quiz')" id="mode-quiz"
+                                        class="ai-mode-btn text-xs font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Quiz</button>
+                                    <button onclick="setAIMode('summarize')" id="mode-summarize"
+                                        class="ai-mode-btn text-xs font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 transition">Summarize</button>
+                                </div>
+                            </div>
+                            <div id="ai-mode-hint" class="text-xs text-purple-600 bg-purple-50 rounded-lg p-2 mb-3">
+                                💡 <strong>Explain mode:</strong> Ask AI to explain any concept clearly for your students.
+                            </div>
+                            <div class="flex gap-2 mb-3">
+                                <input id="ai-query" type="text" placeholder="e.g. What is the chain rule in calculus?"
+                                    class="flex-1 border border-purple-200 rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-purple-300"
+                                    onkeydown="if(event.key==='Enter') askAIAssistant()">
+                                <button onclick="askAIAssistant()" id="ai-ask-btn"
+                                    class="bg-gradient-to-r from-ai to-purple-700 text-white px-4 py-2 rounded-xl font-bold text-sm hover:opacity-90 transition flex items-center gap-1 whitespace-nowrap">
+                                    <span class="material-icons-outlined text-[16px]">send</span> Ask AI
+                                </button>
+                            </div>
+                            <!-- AI Response Area -->
+                            <div id="ai-response-area" class="hidden rounded-xl bg-gradient-to-br from-violet-50 to-purple-50 border border-purple-100 p-4">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                                        <span class="material-icons-outlined text-white text-[16px]">smart_toy</span>
+                                    </div>
+                                    <div id="ai-response-content" class="flex-1 text-sm text-gray-800 leading-relaxed"></div>
+                                </div>
+                                <!-- Quiz answer reveal -->
+                                <div id="quiz-answer" class="hidden mt-3 pt-3 border-t border-purple-200">
+                                    <button onclick="revealQuizAnswer()" class="text-xs font-bold text-purple-600 hover:underline">Reveal Answer</button>
+                                    <div id="quiz-answer-content" class="hidden mt-2 text-sm text-green-700 bg-green-50 rounded-lg p-2"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Session Summary (shown after session ends) -->
+                <div id="session-summary-card" class="hidden glass p-6 rounded-2xl border-2 border-purple-200">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 bg-gradient-to-br from-violet-600 to-purple-700 rounded-xl flex items-center justify-center">
+                            <span class="material-icons-outlined text-white">summarize</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">AI Session Summary</h4>
+                            <p class="text-xs text-gray-500">Generated by Mistral after session ended</p>
+                        </div>
+                    </div>
+                    <div id="session-summary-content" class="space-y-4"></div>
+                </div>
+            </section>
+
+            <!-- ████████ CLASS ROSTER ████████ -->
+            <section id="tsec-roster" class="t-sec space-y-6">
+                <h3 class="font-bold text-xl text-gray-800">Class Roster</h3>
+                <div class="glass rounded-2xl overflow-hidden shadow-sm">
+                    <table class="w-full text-sm text-left">
+                        <thead class="bg-gray-100/50 text-gray-500 uppercase text-xs border-b border-gray-200">
+                            <tr>
+                                <th class="px-5 py-3 font-semibold">Student</th>
+                                <th class="px-4 py-3 font-semibold">Roll No</th>
+                                <th class="px-4 py-3 font-semibold">Section</th>
+                                <th class="px-4 py-3 font-semibold">GPA</th>
+                                <th class="px-4 py-3 font-semibold">Attendance</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roster-tbody" class="divide-y divide-gray-100"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ████████ GRADEBOOK ████████ -->
+            <section id="tsec-gradebook" class="t-sec space-y-6">
+                <h3 class="font-bold text-xl text-gray-800">Full Gradebook</h3>
+                <div class="glass p-6 rounded-2xl border-l-4 border-l-primary">
+                    <div class="bg-gray-50 border border-gray-100 rounded-xl overflow-hidden">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100/50 text-gray-500 uppercase text-xs">
+                                <tr>
+                                    <th class="p-3 font-semibold">Student</th>
+                                    <th class="p-3 font-semibold">Assignment</th>
+                                    <th class="p-3 font-semibold text-right">Rapid Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="gradebook-full" class="divide-y divide-gray-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ████████ LESSON PLANNER ████████ -->
+            <section id="tsec-planner" class="t-sec space-y-6">
+                <h3 class="font-bold text-xl text-gray-800">Syllabus Tracker & Lesson Planner</h3>
+                <div class="glass p-6 rounded-2xl relative overflow-hidden">
+                    <div class="absolute right-[-20px] top-[-20px] text-gray-100 opacity-30 pointer-events-none">
+                        <span class="material-icons-outlined text-[150px]">auto_stories</span>
+                    </div>
+                    <h3 class="font-bold text-gray-800 mb-5 flex items-center gap-2 relative z-10">
+                        <span class="material-icons-outlined">checklist</span> Syllabus Tracker (Calc 101)
+                    </h3>
+                    <div id="syllabus-container" class="space-y-4 relative z-10"></div>
+                </div>
+            </section>
+
+            <!-- ████████ COMMUNICATION ████████ -->
+            <section id="tsec-comms" class="t-sec space-y-6">
+                <h3 class="font-bold text-xl text-gray-800">Communication Hub</h3>
+                <div class="glass p-6 rounded-2xl bg-gradient-to-br from-indigo-50 to-blue-50 border border-blue-100">
+                    <h3 class="font-bold text-blue-900 mb-4 flex items-center gap-2">
+                        <span class="material-icons-outlined">campaign</span> Send Announcement
+                    </h3>
+                    <div class="space-y-3">
+                        <select id="msg-recipient" class="w-full bg-white border border-blue-200 rounded-lg p-2.5 outline-none text-sm font-medium focus:ring-2 focus:ring-blue-500">
+                            <option value="class_all">All Classes</option>
+                            <option value="class_calc">Calculus 101 Students</option>
+                            <option value="parents">All Parents</option>
+                        </select>
+                        <textarea id="msg-body" rows="3" class="w-full bg-white border border-blue-200 rounded-lg p-3 outline-none text-sm focus:ring-2 focus:ring-blue-500 resize-none" placeholder="Type your message here..."></textarea>
+                        <button onclick="sendMessage()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 rounded-lg shadow-sm transition">
+                            Blast Message
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ████████ SETTINGS ████████ -->
+            <section id="tsec-settings" class="t-sec space-y-6">
+                <h3 class="font-bold text-xl text-gray-800">Settings</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass rounded-2xl p-6 space-y-4">
+                        <h3 class="font-bold text-gray-800">Notification Preferences</h3>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-700">Email Alerts</span>
+                            <button onclick="this.classList.toggle('bg-blue-600');this.classList.toggle('bg-gray-300');this.querySelector('span').classList.toggle('translate-x-6')" class="relative w-12 h-6 bg-blue-600 rounded-full transition-all">
+                                <span class="block w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform translate-x-6"></span>
+                            </button>
+                        </div>
+                        <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                            <span class="text-sm font-medium text-gray-700">SMS Alerts</span>
+                            <button onclick="this.classList.toggle('bg-blue-600');this.classList.toggle('bg-gray-300');this.querySelector('span').classList.toggle('translate-x-6')" class="relative w-12 h-6 bg-gray-300 rounded-full transition-all">
+                                <span class="block w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-transform"></span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="glass rounded-2xl p-6 space-y-4">
+                        <h3 class="font-bold text-gray-800">Grading Preferences</h3>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Default Grade Scale: 100</label>
+                            <input type="range" min="10" max="100" value="100" step="10" class="w-full mt-2" oninput="this.previousElementSibling.textContent='Default Grade Scale: '+this.value">
+                        </div>
+                        <div>
+                            <label class="text-sm font-medium text-gray-700">Low Attendance Alert: 75%</label>
+                            <input type="range" min="50" max="90" value="75" class="w-full mt-2" oninput="this.previousElementSibling.textContent='Low Attendance Alert: '+this.value+'%'">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- ═══════════ MODALS ═══════════ -->
+
+    <!-- Substitute Modal -->
+    <div id="sub-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-2xl w-96 max-w-[90%] shadow-2xl">
+            <h3 class="font-bold text-lg text-gray-800 mb-4">Request a Substitute</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase">Date</label>
+                    <input id="sub-date" type="date" class="w-full border border-gray-200 p-2 rounded-lg mt-1 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase">Reason</label>
+                    <select id="sub-reason" class="w-full border border-gray-200 p-2 rounded-lg mt-1 outline-none text-sm">
+                        <option>Sick Leave</option>
+                        <option>Personal Day</option>
+                        <option>Professional Development</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <button onclick="toggleSubModal()" class="px-4 py-2 text-gray-500 font-medium hover:bg-gray-100 rounded-lg transition">Cancel</button>
+                    <button onclick="submitSubRequest()" class="px-4 py-2 bg-secondary text-white font-medium hover:bg-teal-700 rounded-lg shadow transition">Submit Request</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Modal -->
+    <div id="sos-modal" class="fixed inset-0 bg-black/50 z-50 hidden items-center justify-center">
+        <div class="bg-white p-6 rounded-2xl w-96 max-w-[90%] shadow-2xl">
+            <h3 class="font-bold text-lg text-red-600 mb-4 flex items-center gap-2">
+                <span class="material-icons-outlined">warning</span> SOS Alert
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">This will immediately alert the Principal and Administration. Are you sure?</p>
+            <div class="space-y-3">
+                <select id="sos-reason" class="w-full border border-red-200 p-2.5 rounded-lg text-sm outline-none focus:ring-2 focus:ring-red-500">
+                    <option>Emergency Situation</option>
+                    <option>Student Medical Emergency</option>
+                    <option>Security Issue</option>
+                    <option>Facility Emergency</option>
+                    <option>Other</option>
+                </select>
+                <div class="flex gap-2">
+                    <button onclick="confirmSOS()" class="flex-1 bg-red-600 text-white py-2.5 rounded-xl font-bold hover:bg-red-700 transition">Send SOS Now</button>
+                    <button onclick="closeSOS()" class="flex-1 bg-gray-100 py-2.5 rounded-xl font-bold text-gray-600 hover:bg-gray-200">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Session Summary Modal -->
+    <div id="summary-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl scroller">
+            <div class="bg-gradient-to-r from-violet-600 to-purple-700 p-6 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <span class="material-icons-outlined text-white text-3xl">summarize</span>
+                        <div>
+                            <h3 class="font-bold text-white text-lg">AI Session Summary</h3>
+                            <p class="text-purple-200 text-xs">Generated by Mistral AI</p>
+                        </div>
+                    </div>
+                    <button onclick="closeSummaryModal()" class="text-white/70 hover:text-white transition">
+                        <span class="material-icons-outlined">close</span>
+                    </button>
+                </div>
+            </div>
+            <div id="summary-modal-content" class="p-6 space-y-5"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════ JAVASCRIPT ═══════════ -->
+    <script>
+        // ─────────────────────────────────────────────────
+        // STATE
+        // ─────────────────────────────────────────────────
+        let activeSessionId = null;
+        let chatPollInterval = null;
+        let lastChatMsgId = 0;
+        let currentAIMode = 'explain';
+        let currentQuizData = null;
+        let participantPollInterval = null;
+
+        const SIMULATED_STUDENTS = [
+            "Aria Thompson", "Ben Carter", "Chloe Davis", "Dylan Evans",
+            "Emma Foster", "Finn Gallagher", "Grace Harris", "Hunter Ibarra"
+        ];
+
+        // ─────────────────────────────────────────────────
+        // SECTION NAVIGATION
+        // ─────────────────────────────────────────────────
+        const tSecTitles = {
+            command: ['Teacher Command Center', 'Good Morning, Dr. Jenkins'],
+            session: ['Live Online Session', 'Start, manage, and summarize live classes'],
+            roster: ['Class Roster', 'All students in your classes'],
+            gradebook: ['Full Gradebook', 'Grade all pending assignments'],
+            planner: ['Lesson Planner', 'Track syllabus progress'],
+            comms: ['Communication Hub', 'Send announcements & messages'],
+            settings: ['Settings', 'Customize your preferences']
+        };
+
+        function tGoTo(id) {
+            document.querySelectorAll('.t-sec').forEach(s => s.classList.remove('active'));
+            document.getElementById('tsec-' + id).classList.add('active');
+            document.querySelectorAll('.sidebar-btn').forEach(b => {
+                b.classList.remove('sidebar-active');
+                b.classList.add('text-gray-400');
+            });
+            const nb = document.getElementById('tnb-' + id);
+            if (nb) { nb.classList.add('sidebar-active'); nb.classList.remove('text-gray-400'); }
+            const [t, s] = tSecTitles[id] || ['', ''];
+            document.getElementById('t-page-title').innerText = t;
+            document.getElementById('t-page-sub').innerText = s;
+            const loaders = { command: loadCommand, roster: loadRoster, gradebook: loadGradebook, planner: loadPlanner };
+            if (loaders[id]) loaders[id]();
+        }
+
+        // ─────────────────────────────────────────────────
+        // FETCH HELPERS
+        // ─────────────────────────────────────────────────
+        function doFetch(url, cb) {
+            fetch(url).then(r => r.json()).then(d => { if (d.success) cb(d.data); });
+        }
+
+        function postFetch(url, body, cb) {
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            }).then(r => r.json()).then(cb);
+        }
+
+        // ─────────────────────────────────────────────────
+        // COMMAND CENTER
+        // ─────────────────────────────────────────────────
+        function loadCommand() {
+            fetchStats();
+            fetchSchedule();
+            fetchGrading();
+            fetchActivity();
+            fetchHeatmap();
+        }
+
+        function fetchStats() {
+            doFetch('/api/dashboard/stats', d => {
+                document.getElementById('stat-students').innerText = d.total_students;
+                document.getElementById('stat-attendance').innerText = d.avg_attendance + '%';
+                document.getElementById('stat-gpa').innerText = d.avg_gpa;
+                document.getElementById('stat-flags').innerText = d.critical_flags;
+            });
+        }
+
+        function fetchSchedule() {
+            doFetch('/api/dashboard/schedule', data => {
+                document.getElementById('schedule-container').innerHTML = data.map(s => `
+                    <div class="flex items-center gap-3 p-3 rounded-lg border ${s.status === 'Ongoing' ? 'bg-blue-50 border-blue-200' : 'bg-white border-gray-100'}">
+                        <div class="w-2 h-10 ${s.status === 'Ongoing' ? 'bg-blue-500' : 'bg-gray-300'} rounded-full"></div>
+                        <div class="flex-1">
+                            <p class="font-bold text-gray-800 text-sm">${s.subject}</p>
+                            <p class="text-xs text-gray-500 font-medium">${s.time} • ${s.room}</p>
+                        </div>
+                        ${s.status === 'Ongoing' ? '<span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full uppercase tracking-wider live-dot">Now</span>' : ''}
+                    </div>
+                `).join('');
+            });
+        }
+
+        function fetchGrading() {
+            doFetch('/api/dashboard/needs-grading', data => {
+                document.getElementById('grading-container').innerHTML = data.map(item => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3">
+                            <p class="font-bold text-gray-800">${item.student_name}</p>
+                            <p class="text-xs text-gray-400">${item.submitted}</p>
+                        </td>
+                        <td class="p-3 text-gray-600 font-medium">${item.assignment}</td>
+                        <td class="p-3 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <input id="grade-${item.id}" type="number" max="100" class="w-16 border border-gray-200 p-1.5 rounded-lg text-sm text-center outline-none focus:border-primary" placeholder="/ 100">
+                                <button onclick="saveGrade(${item.id})" class="bg-primary hover:bg-blue-700 text-white p-1.5 rounded-lg transition">
+                                    <span class="material-icons-outlined text-[18px]">check</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function saveGrade(id) {
+            const val = document.getElementById(`grade-${id}`).value;
+            if (!val) return alert('Enter a grade!');
+            postFetch('/api/dashboard/save-grade', { id, grade: val }, res => {
+                const btn = document.querySelector(`#grade-${id}`).nextElementSibling;
+                btn.innerHTML = '<span class="material-icons-outlined text-[18px]">done_all</span>';
+                btn.classList.replace('bg-primary', 'bg-green-500');
+                setTimeout(() => btn.parentElement.parentElement.parentElement.remove(), 800);
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // AI LIVE ACTION RADAR
+        // ─────────────────────────────────────────────────
+        function fetchActivity(showLoader = false) {
+            if (showLoader) {
+                document.getElementById('activity-container').innerHTML = `
+                    <div class="flex items-center gap-3 p-4 rounded-xl bg-purple-50 border border-purple-100">
+                        <span class="material-icons-outlined text-purple-400 ai-spin text-[20px]">auto_awesome</span>
+                        <p class="text-sm text-purple-600 font-medium">Mistral AI is analyzing student data...</p>
+                    </div>`;
+                const icon = document.getElementById('radar-refresh-icon');
+                if (icon) icon.classList.add('ai-spin');
+            }
+            doFetch('/api/dashboard/activity-feed', data => {
+                const icon = document.getElementById('radar-refresh-icon');
+                if (icon) icon.classList.remove('ai-spin');
+                renderRadarItems(data);
+            });
+        }
+
+        function renderRadarItems(data) {
+            const colorMap = {
+                critical: 'radar-critical',
+                warning: 'radar-warning',
+                info: 'radar-info'
+            };
+            const textMap = {
+                critical: 'text-red-600',
+                warning: 'text-orange-600',
+                info: 'text-blue-600'
+            };
+            const iconBgMap = {
+                critical: 'bg-red-100 text-red-500',
+                warning: 'bg-orange-100 text-orange-500',
+                info: 'bg-blue-100 text-blue-500'
+            };
+            const btnMap = {
+                critical: 'border-red-200 text-red-600 hover:bg-red-50',
+                warning: 'border-orange-200 text-orange-600 hover:bg-orange-50',
+                info: 'border-blue-200 text-blue-600 hover:bg-blue-50'
+            };
+
+            document.getElementById('activity-container').innerHTML = data.map(a => `
+                <div class="flex items-start gap-3 p-3 rounded-xl border ${colorMap[a.type] || 'bg-white border-gray-100'} transition hover:shadow-sm">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${iconBgMap[a.type] || 'bg-gray-100 text-gray-500'}">
+                        <span class="material-icons-outlined text-[18px]">${a.icon || 'info'}</span>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold ${textMap[a.type] || 'text-gray-700'} leading-snug">${a.text}</p>
+                    </div>
+                    <button onclick="handleAction('${a.action_value}')" class="shrink-0 text-xs font-bold px-3 py-1.5 bg-white rounded-lg border ${btnMap[a.type] || 'border-gray-200 text-gray-600'} hover:shadow-sm transition whitespace-nowrap">
+                        ${a.action_label}
+                    </button>
+                </div>
+            `).join('') + `
+                <div class="flex items-center justify-center gap-1.5 pt-1">
+                    <span class="material-icons-outlined text-[12px] text-purple-400">auto_awesome</span>
+                    <p class="text-[10px] text-purple-400 font-semibold">Powered by Mistral AI</p>
+                </div>
+            `;
+        }
+
+        function refreshRadar() {
+            fetchActivity(true);
+        }
+
+        function handleAction(action) {
+            if (action === 'absent_parents') alertLowAttendance();
+            else if (action === 'sub_details') alert('Substitute request approved for Friday. Dr. Patel will cover your classes.');
+            else alert(`Action triggered: ${action}`);
+        }
+
+        // ─────────────────────────────────────────────────
+        // HEATMAP
+        // ─────────────────────────────────────────────────
+        function fetchHeatmap() {
+            doFetch('/api/dashboard/heatmap', data => {
+                const container = document.getElementById('heatmap-container');
+                let html = '';
+                for (let week = 0; week < data.length; week++) {
+                    let col = '<div class="flex flex-col gap-1">';
+                    for (let day = 0; day < 5; day++) {
+                        let cell = data[week].data ? data[week].data.find(c => c.day_index === day) : null;
+                        let op = cell ? Math.max(0.1, cell.attendance / 100) : 0.1;
+                        let att = cell ? cell.attendance : '?';
+                        let date = cell ? cell.date : 'N/A';
+                        let color = op < 0.5 ? 'bg-red-400' : op < 0.75 ? 'bg-yellow-400' : 'bg-green-500';
+                        col += `<div class="hm-cell w-9 h-9 ${color}" style="opacity:${op}" 
+                            onclick="showHeatmapDetail('${date}', ${att})" 
+                            title="${date}: ${att}%"></div>`;
+                    }
+                    col += '</div>';
+                    html += col;
+                }
+                container.innerHTML = html || '<p class="text-sm text-gray-400">No heatmap data</p>';
+            });
+        }
+
+        function showHeatmapDetail(date, att) {
+            alert(`📅 ${date}\nAttendance: ${att}%\n\n${att < 75 ? '⚠️ Below 75% threshold — action recommended.' : '✅ Attendance is healthy.'}`);
+        }
+
+        // ─────────────────────────────────────────────────
+        // AI HEATMAP INSIGHT
+        // ─────────────────────────────────────────────────
+        function loadHeatmapAI() {
+            const btn = document.getElementById('heatmap-ai-btn');
+            const panel = document.getElementById('heatmap-ai-panel');
+            const trigger = document.getElementById('heatmap-ai-trigger');
+
+            if (btn) {
+                btn.innerHTML = '<span class="material-icons-outlined text-[18px] ai-spin">auto_awesome</span> AI is analyzing...';
+                btn.disabled = true;
+            }
+
+            fetch('/api/dashboard/ai-heatmap-insight')
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.data) {
+                        renderHeatmapAI(res.data);
+                    }
+                    if (btn) {
+                        btn.innerHTML = '<span class="material-icons-outlined text-[18px]">refresh</span> Regenerate Analysis';
+                        btn.disabled = false;
+                    }
+                });
+        }
+
+        function renderHeatmapAI(data) {
+            const panel = document.getElementById('heatmap-ai-panel');
+            const trigger = document.getElementById('heatmap-ai-trigger');
+
+            // Summary
+            document.getElementById('heatmap-ai-summary').innerText = data.summary || 'No analysis available.';
+
+            // Trend badge
+            const trendEl = document.getElementById('heatmap-trend-badge');
+            const trendIcons = { declining: '📉 Declining', improving: '📈 Improving', stable: '➡️ Stable' };
+            trendEl.innerText = trendIcons[data.trend] || '➡️ Stable';
+
+            // Interventions
+            const interventions = data.interventions || [];
+            document.getElementById('heatmap-interventions').innerHTML = interventions.map(item => `
+                <div class="flex items-start gap-3 p-3 bg-white border border-purple-100 rounded-xl hover:border-purple-300 transition">
+                    <div class="w-7 h-7 bg-red-100 rounded-lg flex items-center justify-center shrink-0">
+                        <span class="material-icons-outlined text-red-500 text-[16px]">person_off</span>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-800 text-sm">${item.student || 'Student'}</p>
+                        <p class="text-xs text-gray-500 mt-0.5">${item.issue || ''}</p>
+                        <p class="text-xs font-semibold text-purple-700 mt-1">→ ${item.action || ''}</p>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-xs text-gray-400 text-center py-3">No specific interventions needed — great job! 🎉</p>';
+
+            // Show panel
+            panel.classList.remove('hidden');
+            if (trigger) trigger.innerHTML = `
+                <button onclick="loadHeatmapAI()" id="heatmap-ai-btn"
+                    class="w-full py-3 rounded-xl border-2 border-dashed border-purple-300 text-purple-600 font-bold text-sm hover:bg-purple-50 hover:border-purple-400 transition flex items-center justify-center gap-2">
+                    <span class="material-icons-outlined text-[18px]">refresh</span>
+                    Regenerate AI Analysis
+                </button>`;
+        }
+
+        // ─────────────────────────────────────────────────
+        // ROSTER
+        // ─────────────────────────────────────────────────
+        function loadRoster() {
+            fetch('/api/dashboard/all-students').then(r => r.json()).then(res => {
+                if (res.success && res.data) {
+                    document.getElementById('roster-tbody').innerHTML = res.data.map(s => `
+                        <tr class="hover:bg-gray-50 transition">
+                            <td class="px-5 py-3">
+                                <div class="flex items-center gap-3">
+                                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.full_name)}&size=32&background=random" class="w-8 h-8 rounded-full">
+                                    <span class="font-bold text-gray-800">${s.full_name}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-gray-500 font-mono text-xs">${s.id || '-'}</td>
+                            <td class="px-4 py-3 text-gray-600">-</td>
+                            <td class="px-4 py-3"><span class="font-bold ${s.gpa >= 3.5 ? 'text-green-600' : s.gpa < 2.5 ? 'text-red-500' : 'text-gray-700'}">${s.gpa || '-'}</span></td>
+                            <td class="px-4 py-3">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-16 bg-gray-100 rounded-full h-1.5">
+                                        <div class="${(s.attendance_pct || 0) < 75 ? 'bg-red-500' : 'bg-green-500'} h-1.5 rounded-full" style="width:${s.attendance_pct || 0}%"></div>
+                                    </div>
+                                    <span class="text-xs font-bold ${(s.attendance_pct || 0) < 75 ? 'text-red-600' : 'text-green-600'}">${s.attendance_pct || 0}%</span>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // GRADEBOOK
+        // ─────────────────────────────────────────────────
+        function loadGradebook() {
+            doFetch('/api/dashboard/needs-grading', data => {
+                document.getElementById('gradebook-full').innerHTML = data.map(item => `
+                    <tr class="hover:bg-gray-50">
+                        <td class="p-3"><p class="font-bold text-gray-800">${item.student_name}</p><p class="text-xs text-gray-400">${item.submitted}</p></td>
+                        <td class="p-3 text-gray-600 font-medium">${item.assignment}</td>
+                        <td class="p-3 text-right">
+                            <div class="flex items-center justify-end gap-1">
+                                <input id="gb-grade-${item.id}" type="number" max="100" class="w-16 border border-gray-200 p-1.5 rounded-lg text-sm text-center outline-none focus:border-primary" placeholder="/ 100">
+                                <button onclick="saveGradeGB(${item.id})" class="bg-primary hover:bg-blue-700 text-white p-1.5 rounded-lg transition">
+                                    <span class="material-icons-outlined text-[18px]">check</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            });
+        }
+
+        function saveGradeGB(id) {
+            const val = document.getElementById(`gb-grade-${id}`).value;
+            if (!val) return alert('Enter a grade!');
+            postFetch('/api/dashboard/save-grade', { id, grade: val }, res => {
+                const btn = document.querySelector(`#gb-grade-${id}`).nextElementSibling;
+                btn.innerHTML = '<span class="material-icons-outlined text-[18px]">done_all</span>';
+                btn.classList.replace('bg-primary', 'bg-green-500');
+                setTimeout(() => btn.parentElement.parentElement.parentElement.remove(), 800);
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // PLANNER
+        // ─────────────────────────────────────────────────
+        function loadPlanner() {
+            doFetch('/api/dashboard/lesson-plan', data => {
+                document.getElementById('syllabus-container').innerHTML = data.map(l => `
+                    <div>
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span class="font-bold text-gray-700">${l.week}: ${l.topic}</span>
+                            <span class="font-semibold text-primary">${l.progress}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary h-2 rounded-full transition-all" style="width:${l.progress}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // COMMUNICATION
+        // ─────────────────────────────────────────────────
+        function sendMessage() {
+            const r = document.getElementById('msg-recipient').value;
+            const b = document.getElementById('msg-body').value;
+            if (!b) return alert('Please enter a message!');
+            postFetch('/api/dashboard/communicate', { recipient: r, message: b }, res => {
+                document.getElementById('msg-body').value = '';
+                alert('✅ Message sent successfully!');
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // SOS
+        // ─────────────────────────────────────────────────
+        function alertPrincipal() {
+            const m = document.getElementById('sos-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function closeSOS() {
+            const m = document.getElementById('sos-modal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        }
+        function confirmSOS() {
+            const reason = document.getElementById('sos-reason').value;
+            postFetch('/api/dashboard/sos', { reason }, res => {
+                alert(res.success ? res.data.message : '🚨 SOS Alert sent!');
+                closeSOS();
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // SUBSTITUTE
+        // ─────────────────────────────────────────────────
+        function toggleSubModal() {
+            const m = document.getElementById('sub-modal');
+            m.classList.toggle('hidden'); m.classList.toggle('flex');
+        }
+        function submitSubRequest() {
+            const date = document.getElementById('sub-date').value;
+            const reason = document.getElementById('sub-reason').value;
+            if (!date) return alert('Please select a date!');
+            postFetch('/api/dashboard/communicate', { recipient: 'admin', message: `Sub request for ${date}: ${reason}` }, res => {
+                alert('✅ Substitute request submitted to Administration.');
+                toggleSubModal();
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // ALERT LOW ATTENDANCE
+        // ─────────────────────────────────────────────────
+        function alertLowAttendance() {
+            postFetch('/api/dashboard/alert-low-attendance', {}, res => {
+                if (res.success) alert(res.data.message);
+            });
+        }
+
+        // ═══════════════════════════════════════════════════
+        // LIVE SESSION MODULE
+        // ═══════════════════════════════════════════════════
+
+        function startSession() {
+            const title = document.getElementById('sess-title').value.trim() || 'Live Class';
+            const subject = document.getElementById('sess-subject').value;
+
+            const btn = document.getElementById('start-session-btn');
+            btn.innerHTML = '<span class="material-icons-outlined ai-spin text-[18px]">sync</span> Starting...';
+            btn.disabled = true;
+
+            postFetch('/api/dashboard/session/create', { title, subject }, res => {
+                if (res.success && res.data) {
+                    activeSessionId = res.data.session_id;
+                    onSessionStarted(res.data);
+                } else {
+                    alert('Failed to start session.');
+                    btn.innerHTML = '<span class="material-icons-outlined">play_circle</span> Start Session';
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        function onSessionStarted(data) {
+            activeSessionId = data.session_id;
+
+            // Show control card, hide create card
+            document.getElementById('session-create-card').classList.add('hidden');
+            document.getElementById('session-control-card').classList.remove('hidden');
+            document.getElementById('active-sess-title').innerText = data.title;
+            document.getElementById('active-sess-subject').innerText = data.subject;
+            document.getElementById('active-sess-time').innerText = new Date().toLocaleTimeString();
+
+            // Show live indicator in header
+            document.getElementById('live-session-indicator').classList.remove('hidden');
+            document.getElementById('live-session-indicator').classList.add('flex');
+            document.getElementById('live-session-label').innerText = data.title;
+
+            // Show session status badge
+            const badge = document.getElementById('session-status-badge');
+            badge.classList.remove('hidden'); badge.classList.add('flex');
+
+            // Reset chat
+            lastChatMsgId = 0;
+            document.getElementById('chat-messages').innerHTML = '';
+
+            // Start polling
+            startChatPoll();
+            loadParticipants();
+            startParticipantPoll();
+        }
+
+        function endSession() {
+            if (!activeSessionId) return;
+            if (!confirm('End this session? AI will generate a summary.')) return;
+
+            const btn = document.getElementById('end-session-btn');
+            btn.innerHTML = '<span class="material-icons-outlined ai-spin text-[16px]">auto_awesome</span> Generating AI Summary...';
+            btn.disabled = true;
+
+            postFetch('/api/dashboard/session/end', { session_id: activeSessionId }, res => {
+                if (res.success && res.data) {
+                    onSessionEnded(res.data);
+                } else {
+                    alert('Session ended.');
+                    resetSessionUI();
+                }
+            });
+        }
+
+        function onSessionEnded(data) {
+            stopChatPoll();
+            stopParticipantPoll();
+
+            // Hide live indicator
+            document.getElementById('live-session-indicator').classList.add('hidden');
+            document.getElementById('live-session-indicator').classList.remove('flex');
+
+            // Show summary modal
+            if (data.summary) {
+                renderSessionSummary(data.summary);
+                openSummaryModal();
+            }
+
+            // Also show inline summary
+            renderInlineSummary(data.summary);
+            document.getElementById('session-summary-card').classList.remove('hidden');
+
+            // Reset session controls
+            activeSessionId = null;
+            document.getElementById('session-control-card').classList.add('hidden');
+            document.getElementById('session-create-card').classList.remove('hidden');
+            document.getElementById('start-session-btn').innerHTML = '<span class="material-icons-outlined">play_circle</span> Start Session';
+            document.getElementById('start-session-btn').disabled = false;
+
+            const badge = document.getElementById('session-status-badge');
+            badge.classList.add('hidden'); badge.classList.remove('flex');
+        }
+
+        function renderSessionSummary(s) {
+            const modalEl = document.getElementById('summary-modal-content');
+            modalEl.innerHTML = buildSummaryHTML(s);
+        }
+
+        function renderInlineSummary(s) {
+            const inlineEl = document.getElementById('session-summary-content');
+            inlineEl.innerHTML = buildSummaryHTML(s);
+        }
+
+        function buildSummaryHTML(s) {
+            const topics = (s.topics_covered || []).map(t => `<span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-0.5 rounded-full">${t}</span>`).join(' ');
+            const nextSteps = (s.next_steps || []).map(ns => `<li class="text-sm text-gray-700">${ns}</li>`).join('');
+            const questions = (s.key_questions || []).map(q => `<li class="text-sm text-gray-600 italic">"${q}"</li>`).join('');
+            const score = s.engagement_score || 0;
+            const scoreColor = score >= 75 ? 'text-green-600' : score >= 50 ? 'text-yellow-500' : 'text-red-500';
+            return `
+                <div class="bg-gradient-to-r from-violet-50 to-purple-50 border border-purple-100 rounded-xl p-4">
+                    <p class="font-bold text-gray-800 text-base">${s.headline || 'Session Complete'}</p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white border border-gray-100 rounded-xl p-4 text-center">
+                        <p class="text-3xl font-black ${scoreColor}">${score}</p>
+                        <p class="text-xs text-gray-500 font-semibold mt-1">Engagement Score</p>
+                    </div>
+                    <div class="bg-white border border-gray-100 rounded-xl p-4">
+                        <p class="text-xs font-bold text-gray-400 uppercase mb-2">Topics Covered</p>
+                        <div class="flex flex-wrap gap-1">${topics || '<span class="text-xs text-gray-400">—</span>'}</div>
+                    </div>
+                </div>
+                ${s.overall_assessment ? `
+                <div class="bg-white border border-gray-100 rounded-xl p-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase mb-2">AI Assessment</p>
+                    <p class="text-sm text-gray-700 leading-relaxed">${s.overall_assessment}</p>
+                </div>` : ''}
+                ${nextSteps ? `
+                <div class="bg-white border border-gray-100 rounded-xl p-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase mb-2">Recommended Next Steps</p>
+                    <ul class="space-y-1.5 list-disc list-inside">${nextSteps}</ul>
+                </div>` : ''}
+                ${questions ? `
+                <div class="bg-white border border-gray-100 rounded-xl p-4">
+                    <p class="text-xs font-bold text-gray-400 uppercase mb-2">Key Questions Raised</p>
+                    <ul class="space-y-1.5 list-disc list-inside">${questions}</ul>
+                </div>` : ''}
+            `;
+        }
+
+        function openSummaryModal() {
+            const m = document.getElementById('summary-modal');
+            m.classList.remove('hidden'); m.classList.add('flex');
+        }
+        function closeSummaryModal() {
+            const m = document.getElementById('summary-modal');
+            m.classList.add('hidden'); m.classList.remove('flex');
+        }
+
+        function resetSessionUI() {
+            activeSessionId = null;
+            stopChatPoll();
+            stopParticipantPoll();
+            document.getElementById('session-control-card').classList.add('hidden');
+            document.getElementById('session-create-card').classList.remove('hidden');
+            document.getElementById('start-session-btn').innerHTML = '<span class="material-icons-outlined">play_circle</span> Start Session';
+            document.getElementById('start-session-btn').disabled = false;
+        }
+
+        // ─────────────────────────────────────────────────
+        // CHAT
+        // ─────────────────────────────────────────────────
+        function sendChatMessage() {
+            if (!activeSessionId) return alert('Start a session first!');
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+            input.value = '';
+            postFetch('/api/dashboard/session/chat', {
+                session_id: activeSessionId, message: msg,
+                sender_name: 'Dr. Jenkins', role: 'teacher'
+            }, res => {
+                if (res.success) appendChatMessage(res.data);
+            });
+        }
+
+        function appendChatMessage(msg) {
+            const container = document.getElementById('chat-messages');
+            const isTeacher = msg.role === 'teacher';
+            const isAI = msg.role === 'ai';
+            const isSystem = msg.role === 'system';
+            let bubbleClass = isTeacher ? 'chat-teacher' : isAI ? 'chat-ai' : isSystem ? 'chat-system w-full' : 'chat-student';
+            let align = isTeacher || isAI ? 'flex-row-reverse' : 'flex-row';
+            if (isSystem) {
+                container.innerHTML += `<div class="chat-system p-2"><p>${msg.message}</p></div>`;
+            } else {
+                const avatarColor = isTeacher ? 'bg-primary' : isAI ? 'bg-ai' : 'bg-secondary';
+                const avatarIcon = isTeacher ? 'person' : isAI ? 'smart_toy' : 'person_outline';
+                container.innerHTML += `
+                    <div class="flex ${align} items-end gap-2 max-w-[85%] ${isTeacher || isAI ? 'ml-auto' : ''}">
+                        <div class="w-7 h-7 ${avatarColor} rounded-full flex items-center justify-center shrink-0">
+                            <span class="material-icons-outlined text-white text-[14px]">${avatarIcon}</span>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-gray-400 mb-1 ${isTeacher || isAI ? 'text-right' : ''}">${msg.sender_name}</p>
+                            <div class="${bubbleClass} px-3 py-2 text-sm max-w-xs">${msg.message}</div>
+                        </div>
+                    </div>`;
+            }
+            if (msg.id > lastChatMsgId) lastChatMsgId = msg.id;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function pollChatMessages() {
+            if (!activeSessionId) return;
+            fetch(`/api/dashboard/session/messages/${activeSessionId}?since_id=${lastChatMsgId}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.data.length > 0) {
+                        res.data.forEach(msg => appendChatMessage(msg));
+                    }
+                });
+        }
+
+        function startChatPoll() { chatPollInterval = setInterval(pollChatMessages, 3000); }
+        function stopChatPoll() { if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; } }
+
+        function simulateStudentMessage() {
+            if (!activeSessionId) return alert('Start a session first!');
+            const student = SIMULATED_STUDENTS[Math.floor(Math.random() * SIMULATED_STUDENTS.length)];
+            const questions = [
+                'Can you please explain that again?',
+                'Is this going to be on the exam?',
+                'How does this relate to last week\'s topic?',
+                'Could you show a practical example?',
+                'I\'m confused about the formula, sir.',
+                'What\'s the deadline for the assignment?'
+            ];
+            const msg = questions[Math.floor(Math.random() * questions.length)];
+            postFetch('/api/dashboard/session/chat', {
+                session_id: activeSessionId, message: msg,
+                sender_name: student, role: 'student'
+            }, res => {
+                if (res.success) appendChatMessage(res.data);
+            });
+        }
+
+        // ─────────────────────────────────────────────────
+        // PARTICIPANTS
+        // ─────────────────────────────────────────────────
+        function loadParticipants() {
+            if (!activeSessionId) return;
+            fetch(`/api/dashboard/session/participants/${activeSessionId}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success && res.data) {
+                        renderParticipants(res.data);
+                    }
+                });
+        }
+
+        function renderParticipants(students) {
+            const onlineCount = students.filter(s => s.joined).length;
+            document.getElementById('online-count').innerText = `${onlineCount} online`;
+            document.getElementById('active-sess-count').innerText = `${onlineCount} students`;
+
+            const statusClass = { online: 'p-online', away: 'p-away', offline: 'p-offline' };
+            const statusDot = { online: 'bg-green-500', away: 'bg-yellow-400', offline: 'bg-gray-300' };
+            const statusText = { online: 'Online', away: 'Away', offline: 'Offline' };
+
+            document.getElementById('participants-list').innerHTML = students.map(s => `
+                <div class="flex items-center gap-2 p-2 rounded-lg bg-white ${statusClass[s.status] || 'p-offline'} hover:shadow-sm transition">
+                    <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(s.full_name)}&size=28&background=random" class="w-7 h-7 rounded-full">
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-gray-800 truncate">${s.full_name}</p>
+                    </div>
+                    <span class="w-2 h-2 ${statusDot[s.status] || 'bg-gray-300'} rounded-full"></span>
+                </div>
+            `).join('');
+        }
+
+        function startParticipantPoll() { participantPollInterval = setInterval(loadParticipants, 10000); }
+        function stopParticipantPoll() { if (participantPollInterval) { clearInterval(participantPollInterval); participantPollInterval = null; } }
+
+        // ─────────────────────────────────────────────────
+        // AI SESSION ASSISTANT
+        // ─────────────────────────────────────────────────
+        const aiModeHints = {
+            explain: '💡 <strong>Explain mode:</strong> Ask AI to explain any concept clearly for your students.',
+            quiz: '🎯 <strong>Quiz mode:</strong> Generate a multiple-choice question on any topic.',
+            summarize: '📝 <strong>Summarize mode:</strong> Get a crisp bullet-point summary for any topic.'
+        };
+
+        function setAIMode(mode) {
+            currentAIMode = mode;
+            document.querySelectorAll('.ai-mode-btn').forEach(b => {
+                b.classList.remove('bg-purple-600', 'text-white');
+                b.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            document.getElementById('mode-' + mode).classList.remove('bg-gray-100', 'text-gray-600');
+            document.getElementById('mode-' + mode).classList.add('bg-purple-600', 'text-white');
+            document.getElementById('ai-mode-hint').innerHTML = aiModeHints[mode];
+            document.getElementById('ai-response-area').classList.add('hidden');
+        }
+
+        function askAIAssistant() {
+            const query = document.getElementById('ai-query').value.trim();
+            if (!query) return alert('Please enter a question or topic!');
+            const subject = document.getElementById('sess-subject') ?
+                document.getElementById('sess-subject').value : 'General';
+
+            const btn = document.getElementById('ai-ask-btn');
+            btn.innerHTML = '<span class="material-icons-outlined text-[16px] ai-spin">auto_awesome</span> Thinking...';
+            btn.disabled = true;
+
+            postFetch('/api/dashboard/session/ai-assist', {
+                query, subject, mode: currentAIMode, session_id: activeSessionId
+            }, res => {
+                btn.innerHTML = '<span class="material-icons-outlined text-[16px]">send</span> Ask AI';
+                btn.disabled = false;
+
+                if (res.success && res.data) {
+                    renderAIResponse(res.data);
+                }
+            });
+        }
+
+        function renderAIResponse(data) {
+            const area = document.getElementById('ai-response-area');
+            const content = document.getElementById('ai-response-content');
+            const quizSection = document.getElementById('quiz-answer');
+
+            area.classList.remove('hidden');
+            quizSection.classList.add('hidden');
+            document.getElementById('quiz-answer-content').classList.add('hidden');
+
+            if (data.mode === 'quiz' && typeof data.response === 'object') {
+                const q = data.response;
+                currentQuizData = q;
+                const optionLabels = ['A', 'B', 'C', 'D'];
+                content.innerHTML = `
+                    <p class="font-bold text-gray-800 mb-3">${q.question || 'Question'}</p>
+                    ${(q.options || []).map((opt, i) => `
+                        <div class="flex items-center gap-2 p-2 rounded-lg border border-gray-100 mb-1 hover:bg-purple-50 cursor-pointer">
+                            <span class="w-6 h-6 bg-purple-100 text-purple-700 rounded-full flex items-center justify-center text-xs font-bold">${optionLabels[i]}</span>
+                            <span class="text-sm">${opt}</span>
+                        </div>
+                    `).join('')}
+                `;
+                quizSection.classList.remove('hidden');
+            } else {
+                const responseText = typeof data.response === 'string' ? data.response : JSON.stringify(data.response);
+                content.innerHTML = `<p>${responseText.replace(/\n/g, '<br>')}</p>`;
+            }
+        }
+
+        function revealQuizAnswer() {
+            if (!currentQuizData) return;
+            const labels = ['A', 'B', 'C', 'D'];
+            const correctIdx = currentQuizData.correct || 0;
+            const correct = currentQuizData.options ? currentQuizData.options[correctIdx] : 'N/A';
+            document.getElementById('quiz-answer-content').innerHTML =
+                `✅ Correct Answer: <strong>${labels[correctIdx]}. ${correct}</strong><br><span class="text-gray-600">${currentQuizData.explanation || ''}</span>`;
+            document.getElementById('quiz-answer-content').classList.remove('hidden');
+        }
+
+        // ─────────────────────────────────────────────────
+        // INIT
+        // ─────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCommand();
+            fetchSyllabus();
+        });
+
+        function fetchSyllabus() {
+            doFetch('/api/dashboard/lesson-plan', data => {
+                const el = document.getElementById('syllabus-container');
+                if (el) el.innerHTML = data.map(l => `
+                    <div>
+                        <div class="flex justify-between items-center text-sm mb-1">
+                            <span class="font-bold text-gray-700">${l.week}: ${l.topic}</span>
+                            <span class="font-semibold text-primary">${l.progress}%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-primary h-2 rounded-full" style="width:${l.progress}%"></div>
+                        </div>
+                    </div>
+                `).join('');
+            });
+        }
+    </script>
+</body>
+</html>
